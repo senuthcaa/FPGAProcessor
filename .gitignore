@@ -1,0 +1,19 @@
+# Quartus generated
+db/
+incremental_db/
+output_files/
+simulation/qsim/
+*.qws
+*.bak
+*.rpt
+*.summary
+*.smsg
+*.done
+*.jdi
+*.sld
+*.flock
+
+# ModelSim / Questa
+work/
+transcript
+*.wlf
