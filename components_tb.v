@@ -5,16 +5,13 @@ This file contains a Verilog test bench to test the correctness of the individua
     components used in the processor.
 
 Please enter your student ID:
+-36180513
 
 */
 module components_tb;
 
 	//parameters
 	localparam REG_N = 16;              // width of register_n under test (change to test other N)
-	// localparam CLK_PERIOD = ...;     // TODO: choose a clock period
-
-	//clk
-	reg clk;
 
 	//sign_extend vars
 	reg [8:0] se_in;
@@ -91,6 +88,9 @@ module components_tb;
 	// Clock generation
 	//==========================================================
 	// TODO: initialise clk and toggle it every CLK_PERIOD/2
+	reg clk = 1'b0;
+	always #10 clk = ~clk; //50MHz
+	
 
 	//==========================================================
 	// Optional: error counter / check task
@@ -107,14 +107,63 @@ module components_tb;
 	//
 	//     // ---- Initialise all inputs to known values ----
 	//     // TODO: set every reg above to 0 (avoid X on inputs)
+	initial begin
+		se_in           = 9'd0;
+
+		tick_rst        = 1'b0;
+		tick_enable     = 1'b0;
+
+		mux_SignExtDin  = 16'd0;
+		mux_R0          = 16'd0;
+		mux_R1          = 16'd0;
+		mux_R2          = 16'd0;
+		mux_R3          = 16'd0;
+		mux_R4          = 16'd0;
+		mux_R5          = 16'd0;
+		mux_R6          = 16'd0;
+		mux_R7          = 16'd0;
+		mux_G           = 16'd0;
+		mux_sel         = 4'd0;
+
+		alu_a           = 16'sd0;
+		alu_b           = 16'sd0;
+		alu_op          = 3'b000;
+
+		reg_din         = {REG_N{1'b0}};
+		reg_rin         = 1'b0;
+		reg_rst         = 1'b0;
+	end
+	
+	
+	//SIGN EXTENDER TESTBENCH
+	
+	integer se_counter;
+	integer se_errors;
+	
+	reg [15:0] se_ext_TRUE [0:511];
+	
+	initial begin
+	
+		$readmemh("se_ext_TRUE.dat", se_ext_TRUE);
+		if (se_ext_TRUE[0] === 16'hxxxx) $display("ERROR: se_ext_TRUE.dat not loaded");
+		
+		se_errors = 0;
+		
+		for (se_counter = 0; se_counter < 512; se_counter = se_counter + 1) begin
+			se_in = se_counter;
+			#1
+			if (se_ext_DUT !== se_ext_TRUE[se_counter]) begin
+				se_errors = se_errors + 1;
+				$display("sign_extend FAIL: in=%0d  got=%h  expected=%h", se_counter, se_ext_DUT, se_ext_TRUE[se_counter]);
+			end
+		end
+		
+		if (se_errors != 0) $display("sign_extend: %0d/512 failed", se_errors);
+		
+	end
+	
 	//
-	//     // ---- 1. sign_extend ----
-	//     // TODO: positive input (MSB = 0)            -> upper 7 bits should be 0
-	//     // TODO: negative input (MSB = 1)            -> upper 7 bits should be 1
-	//     // TODO: edge cases: 0, max positive, most negative, all ones
-	//     // TODO: (optional) exhaustive loop over all 512 inputs
-	//
-	//     // ---- 2. tick_FSM ----
+	//     // ---- 2. tick_FSM ---
 	//     // TODO: assert tick_rst for a clock edge    -> expect DIN_READ (0001)
 	//     // TODO: release reset, enable = 1           -> step through 0001 -> 0010 -> 0100 -> 1000 -> 0001
 	//     // TODO: enable = 0 mid-sequence             -> tick should hold
