@@ -54,4 +54,3 @@ set_global_assignment -name VERILOG_FILE components_tb.v
 set_global_assignment -name VERILOG_FILE components.v
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name QIP_FILE MAC.qip
