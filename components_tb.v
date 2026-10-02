@@ -50,6 +50,7 @@ module components_tb;
 	reg tick_done = 1'b0;
 	reg mux_done = 1'b0;
 	reg reg_done = 1'b0;
+	reg alu_done = 1'b0;
 
 	//instantiate modules
 	sign_extend sign_ext_DUT (
@@ -128,7 +129,6 @@ module components_tb;
 
 	integer se_counter;
 	integer se_errors;
-	integer se_done;
 
 	reg [15:0] se_ext_TRUE [0:511];
 
@@ -159,7 +159,6 @@ module components_tb;
 	//TICK FSM TESTBENCH
 
 	integer tick_errors;
-	integer tick_done;
 
 	localparam
 		DIN_READ = 4'b0001,
@@ -234,6 +233,14 @@ module components_tb;
 		#1;
 		check_tick(BUS_WRITE_TWO);
 
+		//advance to BUS_WRITE_ONE, whose next state is not DIN_READ, so rst and enable can be told apart
+		@(posedge clk);
+		#1;
+		check_tick(DIN_READ);
+		@(posedge clk);
+		#1;
+		check_tick(BUS_WRITE_ONE);
+		
 		//test rst mid-sequence, overriding enable = 1
 		@(negedge clk);
 		tick_rst = 1'b1;
@@ -257,7 +264,6 @@ module components_tb;
 
 	integer mux_counter;
 	integer mux_errors;
-	integer mux_done;
 
 	//expected Bus for every value of sel, including the default range
 	reg [15:0] mux_TRUE [0:15];
@@ -346,7 +352,6 @@ module components_tb;
 	//REGISTER_N TESTBENCH
 
 	integer reg_errors;
-	integer reg_done;
 
 	task check_reg;
 		input [REG_N-1:0] expected;
@@ -443,17 +448,6 @@ module components_tb;
 	//ALU TESTBENCH
 
 	integer alu_errors;
-	integer alu_done;
-	
-	task check_alu;
-		input [15:0] expected;
-		begin
-			if (alu_result_DUT !== expected) begin
-				alu_errors = alu_errors + 1;
-				$display("alu FAIL: alu_op=%b alu_a=%0d alu_b=%0d got=%0d expected=%0d",alu_op,alu_a,alu_b,alu_result_DUT,expected)
-			end
-		end
-	endtask
 	
 	localparam
 		OP_MUL = 3'b000,
@@ -636,7 +630,7 @@ module components_tb;
 		#1;
 		check_alu(-16'sd5536);
 		
-				alu_op = OP_SHF;
+		alu_op = OP_SHF;
 		
 		//shift left, b > 0
 		alu_a = 16'sd1;
