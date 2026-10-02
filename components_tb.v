@@ -135,8 +135,11 @@ module components_tb;
 	initial begin
 
 		//creates a huge array of all the possible combinations (brute force method)
-		$readmemh("se_ext_TRUE.dat", se_ext_TRUE);
-		if (se_ext_TRUE[0] === 16'hxxxx) $display("ERROR: se_ext_TRUE.dat not loaded");
+		//0 to 255 have in[8] = 0 so ext is unchanged, 256 to 511 have in[8] = 1 so they are negative and ext is in - 512
+		for (se_counter = 0; se_counter < 512; se_counter = se_counter + 1) begin
+			if (se_counter < 256) se_ext_TRUE[se_counter] = se_counter;
+			else se_ext_TRUE[se_counter] = se_counter - 512;
+		end
 
 		se_errors = 0;
 
