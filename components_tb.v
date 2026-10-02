@@ -636,12 +636,185 @@ module components_tb;
 		#1;
 		check_alu(-16'sd5536);
 		
-		//TODO
-		//SHF (011): b > 0 (shift left), b < 0 (arithmetic shift right)
-		//SHF (011): b = 0, b = 15, b = -15
-		//SHF (011): saturation, b >= 16 (expect 0), b <= -16 (expect sign fill)
-		//SHF (011): negative input_a with right shift (check sign preserved)
-		//unused ops (100 to 111): expect result = 0
+				alu_op = OP_SHF;
+		
+		//shift left, b > 0
+		alu_a = 16'sd1;
+		alu_b = 16'sd1;
+		#1;
+		check_alu(16'sd2);
+		
+		alu_a = 16'sd3;
+		alu_b = 16'sd2;
+		#1;
+		check_alu(16'sd12);
+		
+		alu_a = 16'sh1234;
+		alu_b = 16'sd4;
+		#1;
+		check_alu(16'sh2340);
+		
+		//shift left, bits falling off the top are lost
+		alu_a = 16'sh4000;
+		alu_b = 16'sd1;
+		#1;
+		check_alu(16'sh8000);
+		
+		alu_a = 16'sh8000;
+		alu_b = 16'sd1;
+		#1;
+		check_alu(16'sd0);
+		
+		//shift left is logical, so a negative input_a is not sign extended
+		alu_a = -16'sd1;
+		alu_b = 16'sd1;
+		#1;
+		check_alu(-16'sd2);
+		
+		//b = 0, no change
+		alu_a = 16'sh1234;
+		alu_b = 16'sd0;
+		#1;
+		check_alu(16'sh1234);
+		
+		alu_a = -16'sd12345;
+		alu_b = 16'sd0;
+		#1;
+		check_alu(-16'sd12345);
+		
+		//b = 15, largest shift before saturation
+		alu_a = 16'sh1235;
+		alu_b = 16'sd15;
+		#1;
+		check_alu(16'sh8000);
+		
+		//shift right, b < 0
+		alu_a = 16'sd16;
+		alu_b = -16'sd1;
+		#1;
+		check_alu(16'sd8);
+		
+		alu_a = 16'sd1024;
+		alu_b = -16'sd4;
+		#1;
+		check_alu(16'sd64);
+		
+		//shift right is arithmetic, so the sign of input_a is kept
+		alu_a = -16'sd8;
+		alu_b = -16'sd2;
+		#1;
+		check_alu(-16'sd2);
+		
+		alu_a = 16'sh8000;
+		alu_b = -16'sd1;
+		#1;
+		check_alu(-16'sd16384);
+		
+		//arithmetic shift right rounds toward negative infinity, not toward zero
+		alu_a = -16'sd7;
+		alu_b = -16'sd1;
+		#1;
+		check_alu(-16'sd4);
+		
+		//shifting -1 right != 0
+		alu_a = -16'sd1;
+		alu_b = -16'sd1;
+		#1;
+		check_alu(-16'sd1);
+		
+		//b = -15, largest right shift before saturation
+		alu_a = 16'sh7FFF;
+		alu_b = -16'sd15;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = 16'sh8000;
+		alu_b = -16'sd15;
+		#1;
+		check_alu(-16'sd1);
+		
+		//saturation left, b >= 16 gives 0
+		//without saturate check distance would wrap modulo 16, so b = 16 would just return input_a
+		alu_a = 16'sh1234;
+		alu_b = 16'sd16;
+		#1;
+		check_alu(16'sd0);
+		
+		//b = 17 would wrap to shift of 1
+		alu_a = 16'sh1234;
+		alu_b = 16'sd17;
+		#1;
+		check_alu(16'sd0);
+		
+		//b = 32 would wrap to shift of 0
+		alu_a = 16'sh1234;
+		alu_b = 16'sd32;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = -16'sd1;
+		alu_b = 16'sd16;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = 16'sh1234;
+		alu_b = 16'sd1000;
+		#1;
+		check_alu(16'sd0);
+		
+		//the largest positive b
+		alu_a = 16'sh1234;
+		alu_b = 16'sh7FFF;
+		#1;
+		check_alu(16'sd0);
+		
+		//saturation right, b <= -16 fills with sign of input_a
+		alu_a = 16'sh7FFF;
+		alu_b = -16'sd16;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = 16'sh8000;
+		alu_b = -16'sd16;
+		#1;
+		check_alu(-16'sd1);
+		
+		alu_a = 16'sd12345;
+		alu_b = -16'sd32;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = -16'sd12345;
+		alu_b = -16'sd32;
+		#1;
+		check_alu(-16'sd1);
+		
+		//the most negative b, where negating it overflows but saturation still catches it
+		alu_a = 16'sd12345;
+		alu_b = 16'sh8000;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = -16'sd12345;
+		alu_b = 16'sh8000;
+		#1;
+		check_alu(-16'sd1);
+		
+		//unused ops give 0
+		alu_a = 16'sd12345;
+		alu_b = -16'sd6789;
+		alu_op = 3'b100;
+		#1;
+		check_alu(16'sd0);
+		alu_op = 3'b101;
+		#1;
+		check_alu(16'sd0);
+		alu_op = 3'b110;
+		#1;
+		check_alu(16'sd0);
+		alu_op = 3'b111;
+		#1;
+		check_alu(16'sd0);
 		
 		if (alu_errors != 0) $display("ALU: %0d checks failed", alu_errors);
 		
@@ -649,10 +822,6 @@ module components_tb;
 		
 	end
 		
-	
-		
-	
-	end
 
 
 	//SIMULATION END
@@ -665,7 +834,8 @@ module components_tb;
 		$display("sign extender : %0d failed", se_errors);
 		$display("tick FSM : %0d failed", tick_errors);
 		$display("mux : %0d failed", mux_errors);
-		$display("register_n : %0d failed", reg_errors);1
+		$display("alu : %0d failed", alu_errors);
+		$display("register_n : %0d failed", reg_errors);
 		$stop;
 
 	end
