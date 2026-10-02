@@ -125,6 +125,10 @@ module components_tb;
 	end
 
 
+	//everything between the two directives is simulation only, quartus skips it and modelsim still runs it
+	// synthesis translate_off
+
+
 	//SIGN EXTENDER TESTBENCH
 
 	integer se_counter;
@@ -836,5 +840,7 @@ module components_tb;
 		$stop;
 
 	end
+
+	// synthesis translate_on
 
 endmodule
