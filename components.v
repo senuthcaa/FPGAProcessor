@@ -97,7 +97,7 @@ endmodule
 
 
 
-module ALU (
+module alu (
    input wire signed [15:0] input_a,
    input wire signed [15:0] input_b,
    input wire [2:0] alu_op,
