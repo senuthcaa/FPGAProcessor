@@ -9,7 +9,7 @@ Please enter your name and student ID:
 -
 
 */
-module simple_proc_extension (
+module simple_proc_memory (
 	input wire clk,
 	input wire rst,
 	input wire enable,
