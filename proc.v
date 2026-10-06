@@ -30,7 +30,8 @@ module simple_proc (
 
 	//instruction opcodes, from the moodle x72 instruction table
 	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
-	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick
+	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE)
+	//din is only ever sampled in DIN_READ (instruction) and BUS_WRITE_ONE (immediate), so it may change freely afterwards
 	localparam
 		INSTR_ADD = 3'b001,
 		INSTR_ADDI = 3'b010,
@@ -215,8 +216,9 @@ module simple_proc (
 
 	//control unit
 	//DIN_READ loads din into IR
-	//BUS_WRITE_ONE puts the immediate into Rx for movi, and Rx into A for add, addi and sub
-	//OPERATE_ALU puts Ry through the alu into G for add and sub, and the immediate for addi
+	//BUS_WRITE_ONE puts the immediate into Rx for movi, the immediate into A for addi (so din is not needed again),
+	//    and Rx into A for add and sub
+	//OPERATE_ALU puts Ry through the alu into G for add and sub, and Rx for addi (addition is commutative)
 	//BUS_WRITE_TWO puts G into Rx
 	always @(*) begin
 		//default values
@@ -241,8 +243,13 @@ module simple_proc (
 							mux_sel = SEL_DIN;
 							r_in[IR[5:3]] = 1'b1;
 						end
-						//add, addi and sub first place Rx into A
-						INSTR_ADD, INSTR_ADDI, INSTR_SUB : begin
+						//addi places the immediate into A
+						INSTR_ADDI : begin
+							mux_sel = SEL_DIN;
+							a_in = 1'b1;
+						end
+						//add and sub place Rx into A
+						INSTR_ADD, INSTR_SUB : begin
 							mux_sel = rx_sel;
 							a_in = 1'b1;
 						end
@@ -258,9 +265,9 @@ module simple_proc (
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
-						//addi Rx, immediate
+						//addi Rx, immediate, A already holds the immediate so Rx goes on the bus
 						INSTR_ADDI : begin
-							mux_sel = SEL_DIN;
+							mux_sel = rx_sel;
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
