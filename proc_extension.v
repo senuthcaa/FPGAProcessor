@@ -1,21 +1,22 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-This file contains Verilog code to implement the simple x72 processor for Task 2,
-    which supports the movi, add, addi and sub instructions.
+This file contains Verilog code to implement the extended x72 processor for Task 3,
+    which adds the display register and the disp, mul and ssi instructions to the Task 2 processor.
 
 Please enter your name and student ID:
--Senuth 36180513
+-Hoorad 36166804
 -
 
 */
-module simple_proc_extension (
+module extended_proc (
 	input wire clk,
 	input wire rst,
 	input wire enable,
 	input wire [8:0] din,
 
 	output wire [15:0] bus,
+	output wire [15:0] display,
 	output wire [3:0] tick_FSM,
 
 	output wire [15:0] R0,
@@ -30,16 +31,21 @@ module simple_proc_extension (
 
 	//instruction opcodes, from the moodle x72 instruction table
 	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
-	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick
+	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE)
+	//disp is type 2 but has no immediate, so it finishes in BUS_WRITE_ONE
+	//din is only ever sampled in DIN_READ (instruction) and BUS_WRITE_ONE (immediate), so it may change freely afterwards
 	localparam
+		INSTR_DISP = 3'b000,
 		INSTR_ADD = 3'b001,
 		INSTR_ADDI = 3'b010,
 		INSTR_SUB = 3'b011,
+		INSTR_MUL = 3'b100,
 		INSTR_SSI = 3'b101,
 		INSTR_MOVI = 3'b111;
 
 	//alu op codes, from components.v
 	localparam
+		OP_MUL = 3'b000,
 		OP_ADD = 3'b001,
 		OP_SUB = 3'b010,
 		OP_SHF = 3'b011;
@@ -79,6 +85,7 @@ module simple_proc_extension (
 	reg ir_in;
 	reg a_in;
 	reg g_in;
+	reg h_in;
 	reg [7:0] r_in;
 
 	//Rx and Ry are 3-bit register numbers, a leading zero makes them the 4-bit mux select values
@@ -150,6 +157,15 @@ module simple_proc_extension (
 		.rst(rst)
 	);
 
+	//H register, holds the display value until the next disp instruction
+	register_n #(.N(16)) reg_H (
+		.data_in(bus),
+		.r_in(h_in),
+		.clk(clk),
+		.Q(display),
+		.rst(rst)
+	);
+
 	//general purpose registers
 	register_n #(.N(16)) reg_R0 (
 		.data_in(bus),
@@ -217,9 +233,12 @@ module simple_proc_extension (
 
 	//control unit
 	//DIN_READ loads din into IR
-	//BUS_WRITE_ONE puts the immediate into Rx for movi, and Rx into A for add, addi, sub and ssi
-	//OPERATE_ALU puts Ry through the alu into G for add and sub, and the immediate for addi and ssi
+	//BUS_WRITE_ONE puts Rx into H for disp, the immediate into Rx for movi, the immediate into A for addi and ssi
+	//    (so din is not needed again), and Rx into A for add, sub and mul
+	//OPERATE_ALU puts Ry through the alu into G for add, sub and mul, and Rx for addi and ssi
+	//    (A holds the immediate, which is the shift amount for ssi, so Rx is the value being shifted)
 	//BUS_WRITE_TWO puts G into Rx
+	//ticks that have nothing to do (and unimplemented opcodes) leave every control signal at its default
 	always @(*) begin
 		//default values
 		mux_sel = SEL_R0;
@@ -228,6 +247,7 @@ module simple_proc_extension (
 		ir_in = 1'b0;
 		a_in = 1'b0;
 		g_in = 1'b0;
+		h_in = 1'b0;
 		r_in = 8'b00000000;
 
 		if (enable) begin
@@ -238,13 +258,23 @@ module simple_proc_extension (
 
 				BUS_WRITE_ONE : begin
 					case (IR[8:6])
+						//disp Rx, Rx goes on the bus and into the display register
+						INSTR_DISP : begin
+							mux_sel = rx_sel;
+							h_in = 1'b1;
+						end
 						//movi Rx, immediate, which comes directly from din
 						INSTR_MOVI : begin
 							mux_sel = SEL_DIN;
 							r_in[IR[5:3]] = 1'b1;
 						end
-						//add, addi, sub and ssi first place Rx into A
-						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_SSI : begin
+						//addi and ssi place the immediate into A
+						INSTR_ADDI, INSTR_SSI : begin
+							mux_sel = SEL_DIN;
+							a_in = 1'b1;
+						end
+						//add, sub and mul place Rx into A
+						INSTR_ADD, INSTR_SUB, INSTR_MUL : begin
 							mux_sel = rx_sel;
 							a_in = 1'b1;
 						end
@@ -260,9 +290,9 @@ module simple_proc_extension (
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
-						//addi Rx, immediate
+						//addi Rx, immediate, A already holds the immediate so Rx goes on the bus
 						INSTR_ADDI : begin
-							mux_sel = SEL_DIN;
+							mux_sel = rx_sel;
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
@@ -272,9 +302,15 @@ module simple_proc_extension (
 							alu_op = OP_SUB;
 							g_in = 1'b1;
 						end
-						//shift Rx by immediate
+						//mul Rx, Ry
+						INSTR_MUL : begin
+							mux_sel = ry_sel;
+							alu_op = OP_MUL;
+							g_in = 1'b1;
+						end
+						//ssi Rx, immediate, A already holds the shift amount so Rx goes on the bus to be shifted
 						INSTR_SSI : begin
-							mux_sel = SEL_DIN;
+							mux_sel = rx_sel;
 							alu_op = OP_SHF;
 							g_in = 1'b1;
 						end
@@ -285,7 +321,7 @@ module simple_proc_extension (
 				BUS_WRITE_TWO : begin
 					case (IR[8:6])
 						//write the result in G back to Rx
-						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_SSI : begin
+						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_MUL, INSTR_SSI : begin
 							mux_sel = SEL_G;
 							r_in[IR[5:3]] = 1'b1;
 						end
