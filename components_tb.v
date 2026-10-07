@@ -639,81 +639,81 @@ module components_tb;
 		
 		alu_op = OP_SHF;
 		
-		//shift left, b > 0
+		//shift left, a > 0
 		alu_a = 16'sd1;
 		alu_b = 16'sd1;
 		#1;
 		check_alu(16'sd2);
 		
-		alu_a = 16'sd3;
-		alu_b = 16'sd2;
+		alu_a = 16'sd2;
+		alu_b = 16'sd3;
 		#1;
 		check_alu(16'sd12);
 		
-		alu_a = 16'sh1234;
-		alu_b = 16'sd4;
+		alu_a = 16'sd4;
+		alu_b = 16'sh1234;
 		#1;
 		check_alu(16'sh2340);
 		
 		//shift left, bits falling off the top are lost
-		alu_a = 16'sh4000;
-		alu_b = 16'sd1;
+		alu_a = 16'sd1;
+		alu_b = 16'sh4000;
 		#1;
 		check_alu(16'sh8000);
 		
-		alu_a = 16'sh8000;
-		alu_b = 16'sd1;
+		alu_a = 16'sd1;
+		alu_b = 16'sh8000;
 		#1;
 		check_alu(16'sd0);
 		
-		//shift left is logical, so a negative input_a is not sign extended
-		alu_a = -16'sd1;
-		alu_b = 16'sd1;
+		//shift left is logical, so a negative input_b is not sign extended
+		alu_a = 16'sd1;
+		alu_b = -16'sd1;
 		#1;
 		check_alu(-16'sd2);
 		
-		//b = 0, no change
-		alu_a = 16'sh1234;
-		alu_b = 16'sd0;
+		//a = 0, no change
+		alu_a = 16'sd0;
+		alu_b = 16'sh1234;
 		#1;
 		check_alu(16'sh1234);
 		
-		alu_a = -16'sd12345;
-		alu_b = 16'sd0;
+		alu_a = 16'sd0;
+		alu_b = -16'sd12345;
 		#1;
 		check_alu(-16'sd12345);
 		
-		//b = 15, largest shift before saturation
-		alu_a = 16'sh1235;
-		alu_b = 16'sd15;
+		//a = 15, largest shift before saturation
+		alu_a = 16'sd15;
+		alu_b = 16'sh1235;
 		#1;
 		check_alu(16'sh8000);
 		
-		//shift right, b < 0
-		alu_a = 16'sd16;
-		alu_b = -16'sd1;
+		//shift right, a < 0
+		alu_a = -16'sd1;
+		alu_b = 16'sd16;
 		#1;
 		check_alu(16'sd8);
 		
-		alu_a = 16'sd1024;
-		alu_b = -16'sd4;
+		alu_a = -16'sd4;
+		alu_b = 16'sd1024;
 		#1;
 		check_alu(16'sd64);
 		
-		//shift right is arithmetic, so the sign of input_a is kept
-		alu_a = -16'sd8;
-		alu_b = -16'sd2;
+		//shift right is arithmetic, so the sign of input_b is kept
+		alu_a = -16'sd2;
+		alu_b = -16'sd8;
 		#1;
 		check_alu(-16'sd2);
 		
-		alu_a = 16'sh8000;
-		alu_b = -16'sd1;
+		alu_a = -16'sd1;
+		alu_b = 16'sh8000;
 		#1;
 		check_alu(-16'sd16384);
 		
 		//arithmetic shift right rounds toward negative infinity, not toward zero
-		alu_a = -16'sd7;
-		alu_b = -16'sd1;
+		alu_a = -16'sd1;
+		alu_b = -16'sd7;
 		#1;
 		check_alu(-16'sd4);
 		
@@ -723,81 +723,81 @@ module components_tb;
 		#1;
 		check_alu(-16'sd1);
 		
-		//b = -15, largest right shift before saturation
-		alu_a = 16'sh7FFF;
-		alu_b = -16'sd15;
-		#1;
-		check_alu(16'sd0);
-		
-		alu_a = 16'sh8000;
-		alu_b = -16'sd15;
-		#1;
-		check_alu(-16'sd1);
-		
-		//saturation left, b >= 16 gives 0
-		//without saturate check distance would wrap modulo 16, so b = 16 would just return input_a
-		alu_a = 16'sh1234;
-		alu_b = 16'sd16;
-		#1;
-		check_alu(16'sd0);
-		
-		//b = 17 would wrap to shift of 1
-		alu_a = 16'sh1234;
-		alu_b = 16'sd17;
-		#1;
-		check_alu(16'sd0);
-		
-		//b = 32 would wrap to shift of 0
-		alu_a = 16'sh1234;
-		alu_b = 16'sd32;
-		#1;
-		check_alu(16'sd0);
-		
-		alu_a = -16'sd1;
-		alu_b = 16'sd16;
-		#1;
-		check_alu(16'sd0);
-		
-		alu_a = 16'sh1234;
-		alu_b = 16'sd1000;
-		#1;
-		check_alu(16'sd0);
-		
-		//the largest positive b
-		alu_a = 16'sh1234;
+		//a = -15, largest right shift before saturation
+		alu_a = -16'sd15;
 		alu_b = 16'sh7FFF;
 		#1;
 		check_alu(16'sd0);
 		
-		//saturation right, b <= -16 fills with sign of input_a
+		alu_a = -16'sd15;
+		alu_b = 16'sh8000;
+		#1;
+		check_alu(-16'sd1);
+		
+		//saturation left, a >= 16 gives 0
+		//without saturate check distance would wrap modulo 16, so a = 16 would just return input_b
+		alu_a = 16'sd16;
+		alu_b = 16'sh1234;
+		#1;
+		check_alu(16'sd0);
+		
+		//a = 17 would wrap to shift of 1
+		alu_a = 16'sd17;
+		alu_b = 16'sh1234;
+		#1;
+		check_alu(16'sd0);
+		
+		//a = 32 would wrap to shift of 0
+		alu_a = 16'sd32;
+		alu_b = 16'sh1234;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = 16'sd16;
+		alu_b = -16'sd1;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = 16'sd1000;
+		alu_b = 16'sh1234;
+		#1;
+		check_alu(16'sd0);
+		
+		//the largest positive a
 		alu_a = 16'sh7FFF;
-		alu_b = -16'sd16;
+		alu_b = 16'sh1234;
+		#1;
+		check_alu(16'sd0);
+		
+		//saturation right, a <= -16 fills with sign of input_b
+		alu_a = -16'sd16;
+		alu_b = 16'sh7FFF;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = -16'sd16;
+		alu_b = 16'sh8000;
+		#1;
+		check_alu(-16'sd1);
+		
+		alu_a = -16'sd32;
+		alu_b = 16'sd12345;
+		#1;
+		check_alu(16'sd0);
+		
+		alu_a = -16'sd32;
+		alu_b = -16'sd12345;
+		#1;
+		check_alu(-16'sd1);
+		
+		//the most negative a, where negating it overflows but saturation still catches it
+		alu_a = 16'sh8000;
+		alu_b = 16'sd12345;
 		#1;
 		check_alu(16'sd0);
 		
 		alu_a = 16'sh8000;
-		alu_b = -16'sd16;
-		#1;
-		check_alu(-16'sd1);
-		
-		alu_a = 16'sd12345;
-		alu_b = -16'sd32;
-		#1;
-		check_alu(16'sd0);
-		
-		alu_a = -16'sd12345;
-		alu_b = -16'sd32;
-		#1;
-		check_alu(-16'sd1);
-		
-		//the most negative b, where negating it overflows but saturation still catches it
-		alu_a = 16'sd12345;
-		alu_b = 16'sh8000;
-		#1;
-		check_alu(16'sd0);
-		
-		alu_a = -16'sd12345;
-		alu_b = 16'sh8000;
+		alu_b = -16'sd12345;
 		#1;
 		check_alu(-16'sd1);
 		

@@ -47,7 +47,7 @@ module proc_tb;
 	wire [15:0] R6;
 	wire [15:0] R7;
 
-	simple_proc dut (
+	simple_proc proc_DUT (
 		.clk(clk),
 		.rst(rst),
 		.enable(enable),
