@@ -28,7 +28,7 @@ module memory_proc (
 	output wire [15:0] R6,
 	output wire [15:0] R7,
 	
-	output wire [15:0] PC //program counter: max value of 0xFFFF words
+	output wire [15:0] PC //program counter: max value of 0xFFFF words (half as many instructions)
 );
 
 	//instruction opcodes, from the moodle x72 instruction table
