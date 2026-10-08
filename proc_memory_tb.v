@@ -232,8 +232,8 @@ module proc_memory_tb;
 		end
 	endtask
 
-	//fill every word with 9'h1FF, which runs as movi r7 with -1 as its immediate,
-	//    so running off the end of a program sets R7 to -1 as well as failing the PC checks
+	//fill every word with 9'h1FF, which runs as movi r7 (with -1 as its immediate when the next word is filler too),
+	//    so running off the end of a program changes R7 as well as failing the PC checks
 	task clear_rom;
 		integer a;
 		begin
@@ -313,7 +313,8 @@ module proc_memory_tb;
 			endcase
 			tick_edge;
 
-			//tick 4: BUS_WRITE_TWO, G (the result) for the alu instructions, Rx for bez, nothing for disp and movi
+			//tick 4: BUS_WRITE_TWO, Rx for bez, nothing for disp and movi, and G (the result) for the alu instructions,
+			//    which is saved here and must end up in Rx (the result itself is checked by each section)
 			check_tick(BUS_WRITE_TWO);
 			check_value("tick 4: PC = next instruction", PC, pc_start + 16'd2);
 			check_fetch(pc_start + 16'd2);
