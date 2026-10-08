@@ -1,4 +1,3 @@
-//FIXED restored the timescale directive (lost in commit de0d8fd), every other file has one and ModelSim stops with vsim-3009 when only some modules have one
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
@@ -115,8 +114,6 @@ module ALU (
    wire do_sub = (alu_op == OP_SUB);
    wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b) + do_sub;
 
-   //FIXED shift operands swapped back (commit de0d8fd reverted this to an old copy): input_b is shifted by the amount in input_a,
-   //FIXED because ssi loads the shift amount into A and puts Rx on the bus (input_b), and components_tb.v expects this order
    //bit-shifting, input_b is shifted by the signed amount in input_a (spec table 3)
    //+ve input_a shifts input_b left (logical), -ve input_a shifts input_b right (arithmetic)
    wire shift_right = input_a[15];

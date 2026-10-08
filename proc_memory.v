@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-//FIXED description was copied from proc_extension.v and still said Task 3
 This file contains Verilog code to implement the x72 processor for Task 4,
     which adds the program counter (PC output to the instruction memory) and the bez instruction to the Task 3 processor.
 
@@ -32,7 +31,6 @@ module memory_proc (
 	output wire [15:0] PC //program counter: max value of 0xFFFF words
 );
 
-	//FIXED comment brought in line with proc_extension.v, and documents the 2-word instruction layout the PC relies on
 	//instruction opcodes, from the moodle x72 instruction table
 	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
 	//type 2 is OPCODE Rx xxx, the immediate value is the next word in the instruction memory
@@ -112,8 +110,6 @@ module memory_proc (
 	wire [15:0] PC_next;
 	
 	assign PC_count = PC + 16'd1;
-	//FIXED the bez immediate counts instructions, not words (memory.mif uses 9, 6, 2, -10 and -1 this way),
-	//FIXED and each instruction is 2 words, so the offset is doubled. PC already points to the next instruction here
 	assign PC_branch = PC + {B[14:0], 1'b0};
 	assign PC_next = branch ? PC_branch : PC_count; //2-1 mux
 
@@ -272,7 +268,6 @@ module memory_proc (
 	);
 
 	
-	//FIXED replaced the banner (it ended in a backslash) with a description in the same style as proc_extension.v
 	//control unit
 	//DIN_READ loads din into IR and moves the PC to the immediate word
 	//BUS_WRITE_ONE moves the PC to the next instruction, and puts Rx into H for disp, the immediate into Rx for movi,
@@ -328,7 +323,6 @@ module memory_proc (
 						end
 						INSTR_BEZ : begin
 							mux_sel = SEL_DIN;
-							//FIXED typo, stores -> stored
 							b_in = 1'b1; //the bez immediate value will be stored in register B
 						end
 						default : mux_sel = SEL_R0;

@@ -52,7 +52,6 @@ module proc_extension_tb;
 	wire [15:0] R6;
 	wire [15:0] R7;
 
-	//FIXED instance renamed from dut to proc_DUT, to match proc_tb.v and components_tb.v
 	extended_proc proc_DUT (
 		.clk(clk),
 		.rst(rst),
@@ -79,7 +78,6 @@ module proc_extension_tb;
 	wire [7:0] dec_hex3;
 	wire [7:0] dec_hex4;
 
-	//FIXED instance renamed from dec_dut to dec_DUT, to match proc_tb.v and components_tb.v
 	display_decoder dec_DUT (
 		.value(dec_value),
 		.hex0(dec_hex0),

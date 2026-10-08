@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-//FIXED the decoder is now shared by the Task 3 and Task 4 top levels
 This file contains Verilog code to decode the 16-bit display register into a signed decimal number
     for HEX4 to HEX0, used by the Task 3 and Task 4 top levels.
 
