@@ -126,6 +126,34 @@ module proc_memory_tb;
 		end
 	endfunction
 
+	function [15:0] dut_reg;
+		input [2:0] idx;
+		begin
+			case (idx)
+				3'd0 : dut_reg = R0;
+				3'd1 : dut_reg = R1;
+				3'd2 : dut_reg = R2;
+				3'd3 : dut_reg = R3;
+				3'd4 : dut_reg = R4;
+				3'd5 : dut_reg = R5;
+				3'd6 : dut_reg = R6;
+				default : dut_reg = R7;
+			endcase
+		end
+	endfunction
+
+	function [3:0] tick_of;
+		input [2:0] t;
+		begin
+			case (t)
+				3'd1 : tick_of = DIN_READ;
+				3'd2 : tick_of = BUS_WRITE_ONE;
+				3'd3 : tick_of = OPERATE_ALU;
+				default : tick_of = BUS_WRITE_TWO;
+			endcase
+		end
+	endfunction
+
 	//basic tasks
 
 	//wait for a rising edge, then 1ns, so registered outputs have updated
@@ -172,12 +200,14 @@ module proc_memory_tb;
 		end
 	endtask
 
-	//the stand-in latches the PC on the falling edge, so from then until the next falling edge din is the word at PC
+	//the stand-in latches the PC on the falling edge, so from then until the next falling edge
+	//    din must be the word at the address the PC should hold in this tick
 	task check_fetch;
+		input [15:0] addr;
 		begin
 			@(negedge clk);
 			#1;
-			check_value("din is the word at PC", {7'd0, din}, {7'd0, rom[PC]});
+			check_value("din is the word at the expected PC", {7'd0, din}, {7'd0, rom[addr]});
 		end
 	endtask
 
@@ -202,11 +232,23 @@ module proc_memory_tb;
 		end
 	endtask
 
-	//fill every word with a type 1 add r7, r7, so running off the end of a program is noticed
+	//fill every word with 9'h1FF, which runs as movi r7 (with -1 as its immediate when the next word is filler too),
+	//    so running off the end of a program changes R7 as well as failing the PC checks
 	task clear_rom;
 		integer a;
 		begin
-			for (a = 0; a < 65536; a = a + 1) rom[a] = type1(INSTR_ADD, 3'd7, 3'd7);
+			for (a = 0; a < 65536; a = a + 1) rom[a] = 9'h1FF;
+		end
+	endtask
+
+	//program used by the enable and reset sections
+	task load_pause_prog;
+		begin
+			clear_rom;
+			rom[0] = type2(INSTR_MOVI, 3'd1);   rom[1] = 9'd9;           //movi r1, 9
+			rom[2] = type1(INSTR_ADD, 3'd1, 3'd1);   rom[3] = 9'h1FF;    //add r1, r1      r1 = 18
+			rom[4] = type2(INSTR_DISP, 3'd1);   rom[5] = 9'h1FF;         //disp r1
+			rom[6] = type2(INSTR_BEZ, 3'd0);    rom[7] = 9'h1FC;         //bez r0, -4      8 - 8 = 0
 		end
 	endtask
 
@@ -224,66 +266,107 @@ module proc_memory_tb;
 	//run one instruction, starting at the start of tick 1 and ending at the start of the next tick 1
 	//the PC must step to the immediate word in tick 1 and to the next instruction in tick 2,
 	//    and must end at pc_end (pc_start + 2, or the bez target)
+	//in every tick the bus must hold what the control unit should select for the opcode
 	task run_instr;
 		input [15:0] pc_start;
 		input [15:0] pc_end;
+		reg [8:0] instr;
+		reg [8:0] imm;
+		reg [2:0] op;
+		reg [2:0] rx;
+		reg [2:0] ry;
+		reg [15:0] sext_imm;
+		reg [15:0] result;
 		begin
+			instr = rom[pc_start];
+			imm = rom[pc_start + 16'd1];
+			op = instr[8:6];
+			rx = instr[5:3];
+			ry = instr[2:0];
+			sext_imm = {{7{imm[8]}}, imm};
+
+			//tick 1: DIN_READ, nothing is selected so the bus shows R0
 			check_tick(DIN_READ);
 			check_value("tick 1: PC = instruction address", PC, pc_start);
-			check_fetch;
+			check_fetch(pc_start);
+			check_value("tick 1: bus = R0 (default)", bus, R0);
 			tick_edge;
 
+			//tick 2: BUS_WRITE_ONE, Rx for disp, add, sub and mul, the immediate for the rest
 			check_tick(BUS_WRITE_ONE);
 			check_value("tick 2: PC = immediate address", PC, pc_start + 16'd1);
-			check_fetch;
+			check_fetch(pc_start + 16'd1);
+			case (op)
+				INSTR_DISP, INSTR_ADD, INSTR_SUB, INSTR_MUL : check_value("tick 2: bus = Rx", bus, dut_reg(rx));
+				default : check_value("tick 2: bus = sign-extended immediate", bus, sext_imm);
+			endcase
 			tick_edge;
 
+			//tick 3: OPERATE_ALU, Ry for add, sub and mul, Rx for addi and ssi, nothing for disp, movi and bez
 			check_tick(OPERATE_ALU);
 			check_value("tick 3: PC = next instruction", PC, pc_start + 16'd2);
-			check_fetch;
+			check_fetch(pc_start + 16'd2);
+			case (op)
+				INSTR_ADD, INSTR_SUB, INSTR_MUL : check_value("tick 3: bus = Ry", bus, dut_reg(ry));
+				INSTR_ADDI, INSTR_SSI : check_value("tick 3: bus = Rx", bus, dut_reg(rx));
+				default : check_value("tick 3: bus = R0 (default)", bus, R0);
+			endcase
 			tick_edge;
 
+			//tick 4: BUS_WRITE_TWO, Rx for bez, nothing for disp and movi, and G (the result) for the alu instructions,
+			//    which is saved here and must end up in Rx (the result itself is checked by each section)
 			check_tick(BUS_WRITE_TWO);
 			check_value("tick 4: PC = next instruction", PC, pc_start + 16'd2);
-			check_fetch;
+			check_fetch(pc_start + 16'd2);
+			result = bus;
+			case (op)
+				INSTR_BEZ : check_value("tick 4: bus = Rx", bus, dut_reg(rx));
+				INSTR_DISP, INSTR_MOVI : check_value("tick 4: bus = R0 (default)", bus, R0);
+				default : ;
+			endcase
 			tick_edge;
 
+			//back to tick 1, an alu instruction must have written the result on the bus into Rx
 			check_tick(DIN_READ);
 			check_value("after instruction: PC", PC, pc_end);
+			case (op)
+				INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_MUL, INSTR_SSI : check_value("after instruction: Rx = tick 4 bus", dut_reg(rx), result);
+				default : ;
+			endcase
 		end
 	endtask
 
-	//hold enable low for 3 clocks in tick k of the instruction at pc_start, nothing may change
+	//hold enable low for 3 clocks in tick pause_tick of the instruction at pc_start, nothing may change
 	task run_instr_paused;
 		input [15:0] pc_start;
 		input [15:0] pc_end;
-		input [2:0] k;
+		input [2:0] pause_tick;
 		reg [2:0] n;
-		reg [3:0] held_tick;
-		reg [15:0] held_pc;
-		reg [8:0] held_din;
+		reg [15:0] pause_pc;
 		reg [15:0] held_display;
 		integer p;
 		begin
-			for (n = 3'd1; n < k; n = n + 3'd1) tick_edge;
-			held_tick = tick_FSM;
-			held_pc = PC;
-			@(negedge clk);
-			#1;
-			held_din = din;
+			//the PC is at the instruction in tick 1, the immediate in tick 2 and the next instruction in ticks 3 and 4
+			case (pause_tick)
+				3'd1 : pause_pc = pc_start;
+				3'd2 : pause_pc = pc_start + 16'd1;
+				default : pause_pc = pc_start + 16'd2;
+			endcase
+			for (n = 3'd1; n < pause_tick; n = n + 3'd1) tick_edge;
+			check_tick(tick_of(pause_tick));
+			check_value("before pause: PC", PC, pause_pc);
+			check_fetch(pause_pc);
 			held_display = display;
 			enable = 1'b0;
 			for (p = 0; p < 3; p = p + 1) begin
 				tick_edge;
-				check_tick(held_tick);
-				check_value("paused: PC held", PC, held_pc);
-				@(negedge clk);
-				#1;
-				check_value("paused: din held", {7'd0, din}, {7'd0, held_din});
+				check_tick(tick_of(pause_tick));
+				check_value("paused: PC held", PC, pause_pc);
+				check_fetch(pause_pc);
 				check_value("paused: display held", display, held_display);
 			end
 			enable = 1'b1;
-			for (n = k; n <= 3'd4; n = n + 3'd1) tick_edge;
+			for (n = pause_tick; n <= 3'd4; n = n + 3'd1) tick_edge;
 			check_tick(DIN_READ);
 			check_value("after paused instruction: PC", PC, pc_end);
 		end
@@ -416,6 +499,7 @@ module proc_memory_tb;
 		run_instr(16'd14, 16'd16);
 		run_instr(16'd16, 16'd18);
 		run_instr(16'd18, 16'd40);
+		check_value("filler never ran: r7 = 0", R7, 16'd0);
 		end_section;
 
 		//SECTION 4: bez OFFSET LIMITS AND PC WRAP-AROUND (r0 is 0 after reset, so bez r0 always branches)
@@ -437,15 +521,12 @@ module proc_memory_tb;
 		run_instr(16'd65534, 16'd2);
 		run_instr(16'd2, 16'd4);
 		check_value("after wrap: movi r1, 7", R1, 16'd7);
+		check_value("filler never ran: r7 = 0", R7, 16'd0);
 		end_section;
 
 		//SECTION 5: enable GATING, PAUSE IN EVERY TICK, INCLUDING A TAKEN bez
 		begin_section("enable gating (pause in every tick)");
-		clear_rom;
-		rom[0] = type2(INSTR_MOVI, 3'd1);   rom[1] = 9'd9;           //movi r1, 9
-		rom[2] = type1(INSTR_ADD, 3'd1, 3'd1);   rom[3] = 9'h1FF;    //add r1, r1      r1 = 18
-		rom[4] = type2(INSTR_DISP, 3'd1);   rom[5] = 9'h1FF;         //disp r1
-		rom[6] = type2(INSTR_BEZ, 3'd0);    rom[7] = 9'h1FC;         //bez r0, -4      8 - 8 = 0
+		load_pause_prog;
 		for (k = 1; k <= 4; k = k + 1) begin
 			do_reset;
 			run_instr_paused(16'd0, 16'd2, k[2:0]);
@@ -459,13 +540,21 @@ module proc_memory_tb;
 		end_section;
 
 		//SECTION 6: RESET IN THE MIDDLE OF AN INSTRUCTION, THEN THE PROGRAM MUST RESTART FROM ADDRESS 0
+		//the reset lands in tick k of add r1, r1 at address 2 on the second pass, whose next PC would be 4,
+		//    so PC = 0 can only come from the reset, and r1 (9) and the display (18) are non-zero beforehand
 		begin_section("Reset mid-instruction");
+		load_pause_prog;
 		for (k = 1; k <= 4; k = k + 1) begin
 			do_reset;
 			run_instr(16'd0, 16'd2);
 			run_instr(16'd2, 16'd4);
 			run_instr(16'd4, 16'd6);
+			run_instr(16'd6, 16'd0);
+			run_instr(16'd0, 16'd2);
+			check_value("before reset: r1 = 9", R1, 16'd9);
+			check_value("before reset: display = 18", display, 16'd18);
 			for (i = 1; i < k; i = i + 1) tick_edge;
+			check_tick(tick_of(k[2:0]));
 			rst = 1'b1;
 			tick_edge;
 			rst = 1'b0;
@@ -479,6 +568,7 @@ module proc_memory_tb;
 		end_section;
 
 		//SECTION 7: THE memory.mif PROGRAM, FIBONACCI NUMBERS ON THE DISPLAY UNTIL R4 COUNTS DOWN FROM 23
+		//this is a copy of the program in memory.mif, so keep the two the same if memory.mif changes
 		begin_section("memory.mif program (Fibonacci)");
 		clear_rom;
 		rom[0] = 9'b010000000;   rom[1] = 9'b000000000;     //addi r0, 0
@@ -515,11 +605,13 @@ module proc_memory_tb;
 			end
 		end
 		check_value("23 values were displayed", n_disp, 16'd23);
+		//46368 is above 32767, so the signed HEX4 to HEX0 display shows it as -19168
 		check_value("last value = 46368 (0xB520)", display, 16'hB520);
 		check_value("r4 counted down to 0", R4, 16'd0);
 		while (tick_FSM !== DIN_READ) tick_edge;
 		run_instr(16'd30, 16'd30);
 		run_instr(16'd30, 16'd30);
+		check_value("filler never ran: r7 = 0", R7, 16'd0);
 		end_section;
 
 		//SUMMARY
