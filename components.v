@@ -1,6 +1,8 @@
+//FIXED restored the timescale directive (lost in commit de0d8fd), every other file has one and ModelSim stops with vsim-3009 when only some modules have one
+`timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment 
-This file contains Verilog code to implement individual components to be used in 
+Monash University ECE2072: Assignment
+This file contains Verilog code to implement individual components to be used in
     the CPU.
 
 Please enter your name and student ID:
@@ -113,17 +115,20 @@ module ALU (
    wire do_sub = (alu_op == OP_SUB);
    wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b) + do_sub;
 
-   //bit-shifting
-   wire shift_right = input_b[15];
-   wire [15:0] shift_distance = shift_right ? -input_b : input_b;
+   //FIXED shift operands swapped back (commit de0d8fd reverted this to an old copy): input_b is shifted by the amount in input_a,
+   //FIXED because ssi loads the shift amount into A and puts Rx on the bus (input_b), and components_tb.v expects this order
+   //bit-shifting, input_b is shifted by the signed amount in input_a (spec table 3)
+   //+ve input_a shifts input_b left (logical), -ve input_a shifts input_b right (arithmetic)
+   wire shift_right = input_a[15];
+   wire [15:0] shift_distance = shift_right ? -input_a : input_a;
    wire saturate = |shift_distance[15:4]; //saturate is the boolean: true if shift_distance >= 16
 	wire [3:0] true_shift_distance = shift_distance[3:0];
-	
-	wire signed [15:0] shift_right_arithmetic = input_a >>> true_shift_distance;
-	wire signed [15:0] shift_left_logical = input_a << true_shift_distance;
+
+	wire signed [15:0] shift_right_arithmetic = input_b >>> true_shift_distance;
+	wire signed [15:0] shift_left_logical = input_b << true_shift_distance;
 
    wire [15:0] shifted = shift_right
-		/* shift right -> */? (saturate ? {16{input_a[15]}} : shift_right_arithmetic)
+		/* shift right -> */? (saturate ? {16{input_b[15]}} : shift_right_arithmetic)
 		/* shift left -> */: (saturate ? 16'd0 : shift_left_logical);
 
    always @(*) begin

@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-This file contains Verilog code to implement the DE10-Lite top level for Task 3,
-    which connects the extended x72 processor to the switches, keys, LEDs and HEX5 to HEX0.
+This file contains Verilog code to implement the DE10-Lite top level for Task 4,
+    which connects the x72 processor to the instruction memory (ROM), the switches, keys, LEDs and HEX5 to HEX0.
 
 Please enter your name and student ID:
 -Senuth 36180513
 -
 
 */
-module top_level_extension (
+module top_level_memory (
 	input wire [9:0] SW,
 	input wire [1:0] KEY,
 
@@ -23,7 +23,8 @@ module top_level_extension (
 );
 
 	//SW[9] -> processor enable
-	//SW[8:0] -> processor din
+	//processor PC -> instruction memory address
+	//instruction memory q -> processor din
 	//~KEY[0] -> synchronous processor rst
 	//~KEY[1] -> processor clk
 	//bus[9:0] -> LEDR[9:0]
@@ -37,16 +38,29 @@ module top_level_extension (
 		OPERATE_ALU = 4'b0100,
 		BUS_WRITE_TWO = 4'b1000;
 
+	wire clk;
+	wire [8:0] din;
+	wire [15:0] PC;
+
 	wire [15:0] bus;
 	wire [15:0] display;
 	wire [3:0] tick;
 
-	//instantiate task 3 processor
-	extended_proc proc_inst (
-		.clk(~KEY[1]),
+	assign clk = ~KEY[1];
+
+	//instruction memory, clocked on the falling edge so the word at PC arrives in the same tick
+	instruction_ROM rom_inst (
+		.address(PC),
+		.clock(~clk),
+		.q(din)
+	);
+
+	//instantiate task 4 processor
+	memory_proc proc_inst (
+		.clk(clk),
 		.rst(~KEY[0]),
 		.enable(SW[9]),
-		.din(SW[8:0]),
+		.din(din),
 		.bus(bus),
 		.display(display),
 		.tick_FSM(tick),
@@ -59,7 +73,9 @@ module top_level_extension (
 		.R4(),
 		.R5(),
 		.R6(),
-		.R7()
+		.R7(),
+
+		.PC(PC)
 	);
 
 	//display bottom 10 bits of processor bus on LEDs
