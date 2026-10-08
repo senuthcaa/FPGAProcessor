@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-This file contains Verilog code to implement the simple x72 processor for Task 2,
-    which supports the movi, add, addi and sub instructions.
+This file contains Verilog code to implement the extended x72 processor for Task 3,
+    which adds the display register and the disp, mul and ssi instructions to the Task 2 processor.
 
 Please enter your name and student ID:
--Senuth 36180513
+-Hoorad 36166804
 -
 
 */
@@ -16,6 +16,7 @@ module memory_proc (
 	input wire [8:0] din,
 
 	output wire [15:0] bus,
+	output wire [15:0] display,
 	output wire [3:0] tick_FSM,
 
 	output wire [15:0] R0,
@@ -25,21 +26,25 @@ module memory_proc (
 	output wire [15:0] R4,
 	output wire [15:0] R5,
 	output wire [15:0] R6,
-	output wire [15:0] R7
+	output wire [15:0] R7,
+	
+	output wire [15:0] PC //program counter: max value of 0xFFFF words
 );
 
-	//instruction opcodes, from the moodle x72 instruction table
-	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
-	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick
+	//din op codes
 	localparam
+		INSTR_DISP = 3'b000,
 		INSTR_ADD = 3'b001,
 		INSTR_ADDI = 3'b010,
 		INSTR_SUB = 3'b011,
+		INSTR_MUL = 3'b100,
 		INSTR_SSI = 3'b101,
+		INSTR_BEZ = 3'b110,
 		INSTR_MOVI = 3'b111;
 
 	//alu op codes, from components.v
 	localparam
+		OP_MUL = 3'b000,
 		OP_ADD = 3'b001,
 		OP_SUB = 3'b010,
 		OP_SHF = 3'b011;
@@ -68,6 +73,7 @@ module memory_proc (
 	wire [8:0] IR;
 	wire [15:0] A;
 	wire [15:0] G;
+	wire [15:0] B;
 
 	wire [15:0] SignExtDin;
 	wire [15:0] alu_result;
@@ -79,14 +85,30 @@ module memory_proc (
 	reg ir_in;
 	reg a_in;
 	reg g_in;
+	reg h_in;
+	reg b_in;
 	reg [7:0] r_in;
 
 	//Rx and Ry are 3-bit register numbers, a leading zero makes them the 4-bit mux select values
+	wire [2:0] instruction; //stores instruction opcode
 	wire [3:0] rx_sel;
 	wire [3:0] ry_sel;
-
+	
+	assign instruction = IR[8:6];
 	assign rx_sel = {1'b0, IR[5:3]};
 	assign ry_sel = {1'b0, IR[2:0]};
+	
+	//PC variables
+	reg pc_in;
+	reg branch;
+	
+	wire [15:0] PC_count;
+	wire [15:0] PC_branch;
+	wire [15:0] PC_next;
+	
+	assign PC_count = PC + 16'd1;
+	assign PC_branch = PC + B;
+	assign PC_next = branch ? PC_branch : PC_count; //2-1 mux
 
 	//instantiate modules
 	sign_extend sign_ext_inst (
@@ -147,6 +169,33 @@ module memory_proc (
 		.r_in(g_in),
 		.clk(clk),
 		.Q(G),
+		.rst(rst)
+	);
+
+	//H register, holds the display value until the next disp instruction
+	register_n #(.N(16)) reg_H (
+		.data_in(bus),
+		.r_in(h_in),
+		.clk(clk),
+		.Q(display),
+		.rst(rst)
+	);
+	
+	//B register, holds the immediate value to branch by
+	register_n #(.N(16)) reg_B (
+		.data_in(bus),
+		.r_in(b_in),
+		.clk(clk),
+		.Q(B),
+		.rst(rst)
+	);
+	
+	//PC register, stores program counter
+	register_n #(.N(16)) reg_PC (
+		.data_in(PC_next),
+		.r_in(pc_in),
+		.clk(clk),
+		.Q(PC),
 		.rst(rst)
 	);
 
@@ -215,11 +264,9 @@ module memory_proc (
 		.rst(rst)
 	);
 
-	//control unit
-	//DIN_READ loads din into IR
-	//BUS_WRITE_ONE puts the immediate into Rx for movi, and Rx into A for add, addi, sub and ssi
-	//OPERATE_ALU puts Ry through the alu into G for add and sub, and the immediate for addi and ssi
-	//BUS_WRITE_TWO puts G into Rx
+	
+	//=================== CONTROL UNIT ===================\\
+	
 	always @(*) begin
 		//default values
 		mux_sel = SEL_R0;
@@ -228,41 +275,64 @@ module memory_proc (
 		ir_in = 1'b0;
 		a_in = 1'b0;
 		g_in = 1'b0;
+		h_in = 1'b0;
+		b_in = 1'b0;
 		r_in = 8'b00000000;
-
+		
+		pc_in = 1'b0;
+		branch = 1'b0;
+		
 		if (enable) begin
 			case (tick_FSM)
 
 				//fetch instruction
-				DIN_READ : ir_in = 1'b1;
+				DIN_READ : begin
+					pc_in = 1'b1;
+					ir_in = 1'b1;
+				end
 
 				BUS_WRITE_ONE : begin
-					case (IR[8:6])
+					pc_in = 1'b1;
+					case (instruction)
+						//disp Rx, Rx goes on the bus and into the display register
+						INSTR_DISP : begin
+							mux_sel = rx_sel;
+							h_in = 1'b1;
+						end
 						//movi Rx, immediate, which comes directly from din
 						INSTR_MOVI : begin
 							mux_sel = SEL_DIN;
 							r_in[IR[5:3]] = 1'b1;
 						end
-						//add, addi, sub and ssi first place Rx into A
-						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_SSI : begin
+						//addi and ssi place the immediate into A
+						INSTR_ADDI, INSTR_SSI : begin
+							mux_sel = SEL_DIN;
+							a_in = 1'b1;
+						end
+						//add, sub and mul place Rx into A
+						INSTR_ADD, INSTR_SUB, INSTR_MUL : begin
 							mux_sel = rx_sel;
 							a_in = 1'b1;
+						end
+						INSTR_BEZ : begin
+							mux_sel = SEL_DIN;
+							b_in = 1'b1; //the bez immediate value will be stores in register B
 						end
 						default : mux_sel = SEL_R0;
 					endcase
 				end
 
 				OPERATE_ALU : begin
-					case (IR[8:6])
+					case (instruction)
 						//add Rx, Ry
 						INSTR_ADD : begin
 							mux_sel = ry_sel;
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
-						//addi Rx, immediate
+						//addi Rx, immediate, A already holds the immediate so Rx goes on the bus
 						INSTR_ADDI : begin
-							mux_sel = SEL_DIN;
+							mux_sel = rx_sel;
 							alu_op = OP_ADD;
 							g_in = 1'b1;
 						end
@@ -272,9 +342,15 @@ module memory_proc (
 							alu_op = OP_SUB;
 							g_in = 1'b1;
 						end
-						//shift Rx by immediate
+						//mul Rx, Ry
+						INSTR_MUL : begin
+							mux_sel = ry_sel;
+							alu_op = OP_MUL;
+							g_in = 1'b1;
+						end
+						//ssi Rx, immediate, A already holds the shift amount so Rx goes on the bus to be shifted
 						INSTR_SSI : begin
-							mux_sel = SEL_DIN;
+							mux_sel = rx_sel;
 							alu_op = OP_SHF;
 							g_in = 1'b1;
 						end
@@ -283,11 +359,19 @@ module memory_proc (
 				end
 
 				BUS_WRITE_TWO : begin
-					case (IR[8:6])
+					case (instruction)
 						//write the result in G back to Rx
-						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_SSI : begin
+						INSTR_ADD, INSTR_ADDI, INSTR_SUB, INSTR_MUL, INSTR_SSI : begin
 							mux_sel = SEL_G;
 							r_in[IR[5:3]] = 1'b1;
+						end
+						//check bus (which has value of Rx) to see whether to branch or not.
+						INSTR_BEZ : begin
+							mux_sel = rx_sel;
+							if (bus == 16'd0) begin
+								branch = 1'b1;
+								pc_in = 1'b1;
+							end
 						end
 						default : mux_sel = SEL_R0;
 					endcase
