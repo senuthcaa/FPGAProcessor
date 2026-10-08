@@ -1,8 +1,9 @@
 `timescale 1ns / 1ps
 /*
 Monash University ECE2072: Assignment
-This file contains Verilog code to implement the extended x72 processor for Task 3,
-    which adds the display register and the disp, mul and ssi instructions to the Task 2 processor.
+//FIXED description was copied from proc_extension.v and still said Task 3
+This file contains Verilog code to implement the x72 processor for Task 4,
+    which adds the program counter (PC output to the instruction memory) and the bez instruction to the Task 3 processor.
 
 Please enter your name and student ID:
 -Hoorad 36166804
@@ -31,7 +32,11 @@ module memory_proc (
 	output wire [15:0] PC //program counter: max value of 0xFFFF words
 );
 
-	//din op codes
+	//FIXED comment brought in line with proc_extension.v, and documents the 2-word instruction layout the PC relies on
+	//instruction opcodes, from the moodle x72 instruction table
+	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
+	//type 2 is OPCODE Rx xxx, the immediate value is the next word in the instruction memory
+	//every instruction takes 2 words (type 1 and disp are followed by an unused word), so the PC moves by 2 per instruction
 	localparam
 		INSTR_DISP = 3'b000,
 		INSTR_ADD = 3'b001,
@@ -107,7 +112,9 @@ module memory_proc (
 	wire [15:0] PC_next;
 	
 	assign PC_count = PC + 16'd1;
-	assign PC_branch = PC + B;
+	//FIXED the bez immediate counts instructions, not words (memory.mif uses 9, 6, 2, -10 and -1 this way),
+	//FIXED and each instruction is 2 words, so the offset is doubled. PC already points to the next instruction here
+	assign PC_branch = PC + {B[14:0], 1'b0};
 	assign PC_next = branch ? PC_branch : PC_count; //2-1 mux
 
 	//instantiate modules
@@ -265,8 +272,13 @@ module memory_proc (
 	);
 
 	
-	//=================== CONTROL UNIT ===================\\
-	
+	//FIXED replaced the banner (it ended in a backslash) with a description in the same style as proc_extension.v
+	//control unit
+	//DIN_READ loads din into IR and moves the PC to the immediate word
+	//BUS_WRITE_ONE moves the PC to the next instruction, and puts Rx into H for disp, the immediate into Rx for movi,
+	//    the immediate into A for addi and ssi, Rx into A for add, sub and mul, and the immediate into B for bez
+	//OPERATE_ALU puts Ry through the alu into G for add, sub and mul, and Rx for addi and ssi
+	//BUS_WRITE_TWO puts G into Rx, or for bez puts Rx on the bus and moves the PC by 2 * B when it is 0
 	always @(*) begin
 		//default values
 		mux_sel = SEL_R0;
@@ -316,7 +328,8 @@ module memory_proc (
 						end
 						INSTR_BEZ : begin
 							mux_sel = SEL_DIN;
-							b_in = 1'b1; //the bez immediate value will be stores in register B
+							//FIXED typo, stores -> stored
+							b_in = 1'b1; //the bez immediate value will be stored in register B
 						end
 						default : mux_sel = SEL_R0;
 					endcase
