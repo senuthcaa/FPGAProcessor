@@ -1,4 +1,3 @@
--- FIXED depth was 32768, it must match the 65536-word instruction_ROM (16-bit PC) or Quartus warns that the depths differ
 DEPTH = 65536;
 WIDTH = 9;
 ADDRESS_RADIX = DEC;
