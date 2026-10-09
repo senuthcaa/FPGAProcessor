@@ -80,7 +80,7 @@ module components_tb;
 		.Bus(mux_Bus_DUT)
 	);
 
-	ALU alu_DUT (
+	alu alu_DUT (
 		.input_a(alu_a),
 		.input_b(alu_b),
 		.alu_op(alu_op),
