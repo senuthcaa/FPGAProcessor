@@ -183,4 +183,4 @@ Error: Quartus Prime Analysis & Synthesis was unsuccessful. 9 errors, 3 warnings
 	Error: Elapsed time: 00:00:12
 	Error: Total CPU time (on all processors): 00:00:15
 Error (293001): Quartus Prime Full Compilation was unsuccessful. 11 errors, 3 warnings
-/*
+*/

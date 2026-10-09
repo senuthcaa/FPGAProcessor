@@ -69,7 +69,6 @@ set_global_assignment -name VERILOG_FILE proc_memory_tb.v
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name QIP_FILE instruction_ROM.qip
 # DE10-Lite pin assignments, taken from the Terasic DE10-Lite System Builder project (DE10_LITE_Default.qsf)
 set_location_assignment PIN_C10 -to SW[0]
@@ -210,3 +209,5 @@ set_location_assignment PIN_N19 -to HEX5[5]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX5[5]
 set_location_assignment PIN_N20 -to HEX5[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX5[6]
+
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
