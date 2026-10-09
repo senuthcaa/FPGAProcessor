@@ -71,6 +71,8 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name QIP_FILE instruction_ROM.qip
 # DE10-Lite pin assignments, taken from the Terasic DE10-Lite System Builder project (DE10_LITE_Default.qsf)
+set_location_assignment PIN_P11 -to CLOCK_50
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
 set_location_assignment PIN_C10 -to SW[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[0]
 set_location_assignment PIN_C11 -to SW[1]
