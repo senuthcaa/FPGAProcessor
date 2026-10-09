@@ -123,7 +123,7 @@ module extended_proc (
 		.Bus(bus)
 	);
 
-	ALU alu_inst (
+	alu alu_inst (
 		.input_a(A),
 		.input_b(bus),
 		.alu_op(alu_op),
