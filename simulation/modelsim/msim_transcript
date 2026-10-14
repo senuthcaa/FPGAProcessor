@@ -197,3 +197,5 @@ run -all
 # ** Note: $stop    : C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v(976)
 #    Time: 216703 ns  Iteration: 0  Instance: /proc_extension_tb
 # Break in Module proc_extension_tb at C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v line 976
+# End time: 14:04:15 on Oct 14,2026, Elapsed time: 0:14:03
+# Errors: 0, Warnings: 0
