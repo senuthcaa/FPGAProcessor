@@ -1,0 +1,314 @@
+# Reading C:/intelFPGA_lite/18.1/modelsim_ae/tcl/vsim/pref.tcl
+# do ECE2072Project_run_msim_rtl_verilog.do
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Model Technology ModelSim - Intel FPGA Edition vmap 10.5b Lib Mapping Utility 2016.10 Oct  5 2016
+# vmap work rtl_work 
+# Copying C:/intelFPGA_lite/18.1/modelsim_ae/win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# 
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:58:58 on Oct 14,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v 
+# -- Compiling module proc_extension_tb
+# 
+# Top level modules:
+# 	proc_extension_tb
+# End time: 14:58:58 on Oct 14,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:58:59 on Oct 14,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v 
+# -- Compiling module extended_proc
+# 
+# Top level modules:
+# 	extended_proc
+# End time: 14:58:59 on Oct 14,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:58:59 on Oct 14,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v 
+# -- Compiling module sign_extend
+# -- Compiling module tick_FSM
+# -- Compiling module multiplexer
+# -- Compiling module alu
+# -- Compiling module register_n
+# 
+# Top level modules:
+# 	sign_extend
+# 	tick_FSM
+# 	multiplexer
+# 	alu
+# 	register_n
+# End time: 14:58:59 on Oct 14,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+vsim work.proc_extension_tb proc_extension.v
+# vsim work.proc_extension_tb 
+# Start time: 14:59:27 on Oct 14,2026
+# //  ModelSim - Intel FPGA Edition 10.5b Oct  5 2016
+# //
+# //  Copyright 1991-2016 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  ModelSim - Intel FPGA Edition and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading work.proc_extension_tb
+# Loading work.extended_proc
+# Loading work.sign_extend
+# Loading work.tick_FSM
+# Loading work.multiplexer
+# Loading work.alu
+# Loading work.register_n
+# OpenFile proc_extension.v
+run -all
+# ==================================================
+#  ECE2072 extended_proc testbench (Task 3)
+#  clock period = 10 ns, random instructions = 500
+# ==================================================
+# --- Section 1: Reset
+#     [PASS] 3 checks passed
+# --- Section 2: tick_FSM sequence
+#     [PASS] 24 checks passed
+# --- Section 3: movi
+#     movi r0, 0 : R0 0 -> 0 (0x0000)
+#     movi r1, 1 : R1 0 -> 1 (0x0001)
+#     movi r2, 255 : R2 0 -> 255 (0x00ff)
+#     movi r3, -1 : R3 0 -> -1 (0xffff)
+#     movi r4, -256 : R4 0 -> -256 (0xff00)
+#     movi r5, 127 : R5 0 -> 127 (0x007f)
+#     movi r6, -127 : R6 0 -> -127 (0xff81)
+#     movi r7, 170 : R7 0 -> 170 (0x00aa)
+#     [PASS] 99 checks passed
+# --- Section 4: add
+#     add r0, r1 : R0 5 -> -4 (0xfffc)
+#     add r2, r3 : R2 100 -> 0 (0x0000)
+#     add r4, r6 : R4 255 -> 332 (0x014c)
+#     add r5, r5 : R5 -256 -> -512 (0xfe00)
+#     add r7, r7 : R7 33 -> 66 (0x0042)
+#     add r7, r0 : R7 66 -> 62 (0x003e)
+#     [PASS] 158 checks passed
+# --- Section 5: addi
+#     addi r0, 0 : R0 5 -> 5 (0x0005)
+#     addi r1, 9 : R1 -9 -> 0 (0x0000)
+#     addi r2, 255 : R2 100 -> 355 (0x0163)
+#     addi r3, -256 : R3 -100 -> -356 (0xfe9c)
+#     addi r4, -1 : R4 255 -> 254 (0x00fe)
+#     addi r5, 255 : R5 -256 -> -1 (0xffff)
+#     addi r7, -33 : R7 33 -> 0 (0x0000)
+#     [PASS] 171 checks passed
+# --- Section 6: sub
+#     sub r0, r1 : R0 5 -> 14 (0x000e)
+#     sub r2, r3 : R2 100 -> 200 (0x00c8)
+#     sub r4, r4 : R4 255 -> 0 (0x0000)
+#     sub r5, r6 : R5 -256 -> -333 (0xfeb3)
+#     sub r7, r0 : R7 33 -> 19 (0x0013)
+#     sub r1, r7 : R1 -9 -> -28 (0xffe4)
+#     [PASS] 158 checks passed
+# --- Section 7: Overflow / underflow wrap
+#     movi r0, 255 : R0 14 -> 255 (0x00ff)
+#     add r0, r0 : R0 255 -> 510 (0x01fe)
+#     add r0, r0 : R0 510 -> 1020 (0x03fc)
+#     add r0, r0 : R0 1020 -> 2040 (0x07f8)
+#     add r0, r0 : R0 2040 -> 4080 (0x0ff0)
+#     add r0, r0 : R0 4080 -> 8160 (0x1fe0)
+#     add r0, r0 : R0 8160 -> 16320 (0x3fc0)
+#     add r0, r0 : R0 16320 -> 32640 (0x7f80)
+#     addi r0, 127 : R0 32640 -> 32767 (0x7fff)
+#     movi r1, 1 : R1 -28 -> 1 (0x0001)
+#     add r0, r1 : R0 32767 -> -32768 (0x8000)
+#     addi r0, -1 : R0 -32768 -> 32767 (0x7fff)
+#     addi r0, 255 : R0 32767 -> -32514 (0x80fe)
+#     movi r2, 0 : R2 200 -> 0 (0x0000)
+#     sub r2, r1 : R2 0 -> -1 (0xffff)
+#     sub r0, r2 : R0 -32514 -> -32513 (0x80ff)
+#     movi r3, -256 : R3 -100 -> -256 (0xff00)
+#     sub r4, r4 : R4 0 -> 0 (0x0000)
+#     sub r4, r1 : R4 0 -> -1 (0xffff)
+#     add r3, r3 : R3 -256 -> -512 (0xfe00)
+#     [PASS] 240 checks passed
+# --- Section 8: din held (no scrambling)
+#     [PASS] 130 checks passed
+# --- Section 9: Exhaustive Rx / Ry addressing
+#     [PASS] 13232 checks passed
+# --- Section 10: enable gating (pause in every tick)
+#     [PASS] 810 checks passed
+# --- Section 11: Reset mid-instruction
+#     [PASS] 381 checks passed
+# --- Section 12: Undefined opcode (bez) is a NOP
+#     [PASS] 146 checks passed
+# --- Section 13: Random regression (LFSR)
+#     [PASS] 6302 checks passed
+# --- Section 14: Task 3: mul, ssi and disp
+#     [PASS] 5 checks passed
+# 
+# ==================================================
+#  TEST SUMMARY
+# ==================================================
+#   PASS  Reset (3 checks)
+#   PASS  tick_FSM sequence (24 checks)
+#   PASS  movi (99 checks)
+#   PASS  add (158 checks)
+#   PASS  addi (171 checks)
+#   PASS  sub (158 checks)
+#   PASS  Overflow / underflow wrap (240 checks)
+#   PASS  din held (no scrambling) (130 checks)
+#   PASS  Exhaustive Rx / Ry addressing (13232 checks)
+#   PASS  enable gating (pause in every tick) (810 checks)
+#   PASS  Reset mid-instruction (381 checks)
+#   PASS  Undefined opcode (bez) is a NOP (146 checks)
+#   PASS  Random regression (LFSR) (6302 checks)
+#   PASS  Task 3: mul, ssi and disp (5 checks)
+# --------------------------------------------------
+#  ALL 21859 CHECKS PASSED
+# ==================================================
+# ** Note: $stop    : C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v(825)
+#    Time: 83676 ns  Iteration: 0  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v line 825
+vsim work.proc_extension_tb broken_proc_extension.v
+# End time: 15:01:01 on Oct 14,2026, Elapsed time: 0:01:34
+# Errors: 0, Warnings: 0
+# vsim work.proc_extension_tb 
+# Start time: 15:01:01 on Oct 14,2026
+# Loading work.proc_extension_tb
+# Loading work.extended_proc
+# Loading work.sign_extend
+# Loading work.tick_FSM
+# Loading work.multiplexer
+# Loading work.alu
+# Loading work.register_n
+# OpenFile broken_proc_extension.v
+run -all
+# ==================================================
+#  ECE2072 extended_proc testbench (Task 3)
+#  clock period = 10 ns, random instructions = 500
+# ==================================================
+# --- Section 1: Reset
+#     [PASS] 3 checks passed
+# --- Section 2: tick_FSM sequence
+#     [PASS] 24 checks passed
+# --- Section 3: movi
+#     movi r0, 0 : R0 0 -> 0 (0x0000)
+#     movi r1, 1 : R1 0 -> 1 (0x0001)
+#     movi r2, 255 : R2 0 -> 255 (0x00ff)
+#     movi r3, -1 : R3 0 -> -1 (0xffff)
+#     movi r4, -256 : R4 0 -> -256 (0xff00)
+#     movi r5, 127 : R5 0 -> 127 (0x007f)
+#     movi r6, -127 : R6 0 -> -127 (0xff81)
+#     movi r7, 170 : R7 0 -> 170 (0x00aa)
+#     [PASS] 99 checks passed
+# --- Section 4: add
+#     add r0, r1 : R0 5 -> -4 (0xfffc)
+#     add r2, r3 : R2 100 -> 0 (0x0000)
+#     add r4, r6 : R4 255 -> 332 (0x014c)
+#     add r5, r5 : R5 -256 -> -512 (0xfe00)
+#     add r7, r7 : R7 33 -> 66 (0x0042)
+#     add r7, r0 : R7 66 -> 62 (0x003e)
+#     [PASS] 158 checks passed
+# --- Section 5: addi
+#     addi r0, 0 : R0 5 -> 5 (0x0005)
+#     addi r1, 9 : R1 -9 -> 0 (0x0000)
+#     addi r2, 255 : R2 100 -> 355 (0x0163)
+#     addi r3, -256 : R3 -100 -> -356 (0xfe9c)
+#     addi r4, -1 : R4 255 -> 254 (0x00fe)
+#     addi r5, 255 : R5 -256 -> -1 (0xffff)
+#     addi r7, -33 : R7 33 -> 0 (0x0000)
+#     [PASS] 171 checks passed
+# --- Section 6: sub
+#     sub r0, r1 : R0 5 -> 14 (0x000e)
+#     sub r2, r3 : R2 100 -> 200 (0x00c8)
+#     sub r4, r4 : R4 255 -> 0 (0x0000)
+#     sub r5, r6 : R5 -256 -> -333 (0xfeb3)
+#     sub r7, r0 : R7 33 -> 19 (0x0013)
+#     sub r1, r7 : R1 -9 -> -28 (0xffe4)
+#     [PASS] 158 checks passed
+# --- Section 7: Overflow / underflow wrap
+#     movi r0, 255 : R0 14 -> 255 (0x00ff)
+#     add r0, r0 : R0 255 -> 510 (0x01fe)
+#     add r0, r0 : R0 510 -> 1020 (0x03fc)
+#     add r0, r0 : R0 1020 -> 2040 (0x07f8)
+#     add r0, r0 : R0 2040 -> 4080 (0x0ff0)
+#     add r0, r0 : R0 4080 -> 8160 (0x1fe0)
+#     add r0, r0 : R0 8160 -> 16320 (0x3fc0)
+#     add r0, r0 : R0 16320 -> 32640 (0x7f80)
+#     addi r0, 127 : R0 32640 -> 32767 (0x7fff)
+#     movi r1, 1 : R1 -28 -> 1 (0x0001)
+#     add r0, r1 : R0 32767 -> -32768 (0x8000)
+#     addi r0, -1 : R0 -32768 -> 32767 (0x7fff)
+#     addi r0, 255 : R0 32767 -> -32514 (0x80fe)
+#     movi r2, 0 : R2 200 -> 0 (0x0000)
+#     sub r2, r1 : R2 0 -> -1 (0xffff)
+#     sub r0, r2 : R0 -32514 -> -32513 (0x80ff)
+#     movi r3, -256 : R3 -100 -> -256 (0xff00)
+#     sub r4, r4 : R4 0 -> 0 (0x0000)
+#     sub r4, r1 : R4 0 -> -1 (0xffff)
+#     add r3, r3 : R3 -256 -> -512 (0xfe00)
+#     [PASS] 240 checks passed
+# --- Section 8: din held (no scrambling)
+#     [PASS] 130 checks passed
+# --- Section 9: Exhaustive Rx / Ry addressing
+#     [PASS] 13232 checks passed
+# --- Section 10: enable gating (pause in every tick)
+#     [PASS] 810 checks passed
+# --- Section 11: Reset mid-instruction
+#     [PASS] 381 checks passed
+# --- Section 12: Undefined opcode (bez) is a NOP
+#     [PASS] 146 checks passed
+# --- Section 13: Random regression (LFSR)
+#     [PASS] 6302 checks passed
+# --- Section 14: Task 3: mul, ssi and disp
+#     [PASS] 5 checks passed
+# 
+# ==================================================
+#  TEST SUMMARY
+# ==================================================
+#   PASS  Reset (3 checks)
+#   PASS  tick_FSM sequence (24 checks)
+#   PASS  movi (99 checks)
+#   PASS  add (158 checks)
+#   PASS  addi (171 checks)
+#   PASS  sub (158 checks)
+#   PASS  Overflow / underflow wrap (240 checks)
+#   PASS  din held (no scrambling) (130 checks)
+#   PASS  Exhaustive Rx / Ry addressing (13232 checks)
+#   PASS  enable gating (pause in every tick) (810 checks)
+#   PASS  Reset mid-instruction (381 checks)
+#   PASS  Undefined opcode (bez) is a NOP (146 checks)
+#   PASS  Random regression (LFSR) (6302 checks)
+#   PASS  Task 3: mul, ssi and disp (5 checks)
+# --------------------------------------------------
+#  ALL 21859 CHECKS PASSED
+# ==================================================
+# ** Note: $stop    : C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v(825)
+#    Time: 83676 ns  Iteration: 0  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v line 825
+vsim work.proc_extension_tb broken_proc_extension
+# End time: 15:04:16 on Oct 14,2026, Elapsed time: 0:03:15
+# Errors: 0, Warnings: 0
+# vsim work.proc_extension_tb broken_proc_extension 
+# Start time: 15:04:16 on Oct 14,2026
+# Loading work.proc_extension_tb
+# Loading work.extended_proc
+# Loading work.sign_extend
+# Loading work.tick_FSM
+# Loading work.multiplexer
+# Loading work.alu
+# Loading work.register_n
+# ** Error: (vsim-3170) Could not find 'broken_proc_extension'.
+#         Searched libraries:
+#             C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/simulation/modelsim/rtl_work
+# Error loading design
+# End time: 15:05:43 on Oct 14,2026, Elapsed time: 0:01:27
+# Errors: 1, Warnings: 0
