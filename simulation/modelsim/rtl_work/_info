@@ -8,58 +8,105 @@ z2
 !i10f 100
 cModel Technology
 Z0 dC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/simulation/modelsim
-vALU
-Z1 !s110 1790915226
+valu
+Z1 !s110 1791946089
 !i10b 1
-!s100 [=g`]9;YkMkfCUCJ]?j2D3
-I:B34f7FIggn>G46VWKB[O0
+!s100 ^UHfYOQO>M5HLE8z=[1YB1
+IW2M0h]jF6bXSW6]A8AeFg3
 Z2 VDg1SIo80bB@j0V0VzS_@n1
 R0
-Z3 w1790913798
-Z4 8components.v
-Z5 Fcomponents.v
-L0 99
+Z3 w1791945624
+Z4 8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v
+Z5 FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v
+L0 96
 Z6 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z7 !s108 1790915226.000000
-Z8 !s107 components_tb.v|components.v|
-Z9 !s90 -reportprogress|300|components.v|components_tb.v|
+Z7 !s108 1791946089.000000
+Z8 !s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
+Z9 !s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
 !i113 1
-Z10 tCvgOpt 0
-n@a@l@u
-vcomponents_tb
+Z10 o-vlog01compat -work work
+Z11 !s92 -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor
+Z12 tCvgOpt 0
+vdisplay_decoder
 R1
 !i10b 1
-!s100 k::IEcVQc<;HoUhj6c`CH1
-IeCFmeCo3P^zCW26j?ezA<2
+!s100 3;^BRf0@1W6BInMzbz^ZC2
+I[Z;70_ek[EO0HmiI?_bhO0
 R2
 R0
-w1790914169
-8components_tb.v
-Fcomponents_tb.v
-Z11 L0 11
+Z13 w1791945629
+Z14 8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v
+Z15 FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v
+L0 70
 R6
 r1
 !s85 0
 31
 R7
-R8
-R9
+Z16 !s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v|
+Z17 !s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v|
 !i113 1
 R10
+R11
+R12
+vextended_proc
+R1
+!i10b 1
+!s100 faaa5N59Yh>IJ@g;9_aDg3
+I8CEk?GizeeFT?IZMz?kfQ1
+R2
+R0
+w1791945627
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v
+L0 8
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v|
+!i113 1
+R10
+R11
+R12
+vhex_digit
+R1
+!i10b 1
+!s100 S[mM^4W:BeM_lFz]DEX3A0
+Io_dVioQUc@Czz^`f13gli3
+R2
+R0
+R13
+R14
+R15
+L0 42
+R6
+r1
+!s85 0
+31
+R7
+R16
+R17
+!i113 1
+R10
+R11
+R12
 vmultiplexer
 R1
 !i10b 1
-!s100 V;Wfm0jAekDDHTVlS>V8W0
-IKRC538nPa6HRXZ:;Y42EV0
+!s100 n^G16>dFca9FOJz?^6zo^0
+I;KP^NVE741MS5CzOBeCc11
 R2
 R0
 R3
 R4
 R5
-L0 62
+L0 59
 R6
 r1
 !s85 0
@@ -69,17 +116,41 @@ R8
 R9
 !i113 1
 R10
+R11
+R12
+vproc_extension_tb
+R1
+!i10b 1
+!s100 [JnPZ9Sl1eN^@A=I>b:J22
+IDkZRX@MjD3K3dCBd?MA1P0
+R2
+R0
+w1791938760
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v
+L0 13
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v|
+!i113 1
+R10
+R11
+R12
 vregister_n
 R1
 !i10b 1
-!s100 D<UE@IGZL?oR>4ahZV0Sa1
-I<ofY_6mc2Pi`cP>9lX=2l0
+!s100 li@h6:=IbW^0O[fQb;38;3
+I;?McaP]j`WY6m8X8KE@Zi1
 R2
 R0
 R3
 R4
 R5
-L0 142
+L0 140
 R6
 r1
 !s85 0
@@ -89,17 +160,19 @@ R8
 R9
 !i113 1
 R10
+R11
+R12
 vsign_extend
 R1
 !i10b 1
-!s100 ?Hae9Ahokfo6dLCo1MzOW2
-I0zR^kaQIX2E3ELGKSK]eT0
+!s100 <L0[QhnoZ_Izko3V1ePbC1
+I:Q0S=<LL@TZRSh_XH6m;N0
 R2
 R0
 R3
 R4
 R5
-R11
+L0 8
 R6
 r1
 !s85 0
@@ -109,17 +182,41 @@ R8
 R9
 !i113 1
 R10
+R11
+R12
+vsigned_bcd
+R1
+!i10b 1
+!s100 1k<Za[>3:ndO;oRlc3H?K1
+Ic3FCn0FX78mQ2m0lR2LI:2
+R2
+R0
+R13
+R14
+R15
+L0 10
+R6
+r1
+!s85 0
+31
+R7
+R16
+R17
+!i113 1
+R10
+R11
+R12
 vtick_FSM
 R1
 !i10b 1
-!s100 V2:K7W;iZN^_bJzN>zEOO2
-IG>9^1=Yge52TXPhe4IQB`3
+!s100 ]O3W4ZRUT]lg4;EXGTT143
+ICXY47Ha2dk514JVkVjN4A1
 R2
 R0
 R3
 R4
 R5
-L0 22
+L0 19
 R6
 r1
 !s85 0
@@ -129,4 +226,6 @@ R8
 R9
 !i113 1
 R10
+R11
+R12
 ntick_@f@s@m

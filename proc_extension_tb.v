@@ -977,10 +977,10 @@ module proc_extension_tb;
 
 	end
 
-	//watchdog, stops the simulation if the testbench ever stalls
+	//stops the simulation if the testbench ever stalls
 	initial begin
 		#(CLK_PERIOD * 2000000);
-		$display("[FAIL] watchdog timeout, testbench did not finish");
+		$display("[FAIL] timeout, testbench did not finish");
 		$stop;
 	end
 
