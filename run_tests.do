@@ -43,19 +43,28 @@ proc rt_banner {text} {
 	rt_rule =
 }
 
-#the project folder is the one with the broken files in it, simulation/modelsim has old copies of some files
-#if ModelSim is somewhere else, look for the "do <path>/run_tests.do" command that started this script
+#the project folder is the one with ECE2072Project.qpf and the broken files in it
+#simulation/modelsim also has copies of some files (including an old proc_extension_tb.v), so it must not be used
+proc rt_is_project {dir} {
+	return [expr {[file exists [file join $dir ECE2072Project.qpf]] && [file exists [file join $dir broken_components.v]]}]
+}
+
+#use the current folder if it is the project folder, else two folders up (where ModelSim starts when Quartus opens it),
+#    else the folder of the "do <path>/run_tests.do" command that started this script
 proc rt_find_project {} {
-	if {[file exists broken_components.v]} { return 1 }
+	if {[rt_is_project .]} { return 1 }
+	set dirs [list [file join .. ..]]
 	for {set i [info frame]} {$i >= 1} {incr i -1} {
 		if {[catch {info frame $i} f] || ![dict exists $f cmd]} { continue }
 		if {[regexp {(?:^|[;\s])do\s+"?([^\s;"]*run_tests\.do)} [dict get $f cmd] -> path]} {
-			set dir [file dirname [file normalize $path]]
-			if {[file exists [file join $dir broken_components.v]]} {
-				cd $dir
-				echo "run_tests.do: running in $dir"
-				return 1
-			}
+			lappend dirs [file dirname $path]
+		}
+	}
+	foreach dir $dirs {
+		if {[rt_is_project $dir]} {
+			cd [file normalize $dir]
+			echo "run_tests.do: running in [pwd]"
+			return 1
 		}
 	}
 	return 0
@@ -147,7 +156,7 @@ proc rt_main {} {
 	global rt_tests
 	catch {quit -sim}
 	if {![rt_find_project]} {
-		echo "run_tests.do: cd to the project folder (the one with components.v and broken_components.v) and run it again"
+		echo "run_tests.do: cd to the project folder (the one with ECE2072Project.qpf) and run it again"
 		return
 	}
 
