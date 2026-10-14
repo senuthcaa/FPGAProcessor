@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the extended x72 processor for Task 3,
-    which adds the display register and the disp, mul and ssi instructions to the Task 2 processor.
 
-Please enter your name and student ID:
--Hoorad 36166804
--
+-Hoorad 36166804: all of file
+ 
 
 */
 module extended_proc (
@@ -29,9 +25,9 @@ module extended_proc (
 	output wire [15:0] R7
 );
 
-	//instruction opcodes, from the moodle x72 instruction table
-	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
-	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE)
+	//instruction opcodes
+	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0], register to register
+	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE), register to immediate
 	//disp is type 2 but has no immediate, so it finishes in BUS_WRITE_ONE
 	//din is only ever sampled in DIN_READ (instruction) and BUS_WRITE_ONE (immediate), so it may change freely afterwards
 	localparam

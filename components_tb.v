@@ -1,11 +1,7 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains a Verilog test bench to test the correctness of the individual
-    components used in the processor.
-
-Please enter your student ID:
--36180513
+-36180513 Senuth: alu, register_n
+-36166804 Hoorad: sign_extend, tick_FSM, multiplexer
 
 */
 module components_tb;
@@ -138,7 +134,7 @@ module components_tb;
 
 	initial begin
 
-		//creates a huge array of all the possible combinations (brute force method)
+		//creates a huge array of all the possible combinations brute forcing combinations
 		//0 to 255 have in[8] = 0 so ext is unchanged, 256 to 511 have in[8] = 1 so they are negative and ext is in - 512
 		for (se_counter = 0; se_counter < 512; se_counter = se_counter + 1) begin
 			if (se_counter < 256) se_ext_TRUE[se_counter] = se_counter;

@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the x72 processor for Task 4,
-    which adds the program counter (PC output to the instruction memory) and the bez instruction to the Task 3 processor.
 
-Please enter your name and student ID:
--Hoorad 36166804
--
+-Senuth 36180513:
+
 
 */
 module memory_proc (

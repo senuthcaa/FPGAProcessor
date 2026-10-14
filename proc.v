@@ -1,12 +1,7 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the simple x72 processor for Task 2,
-    which supports the movi, add, addi and sub instructions.
-
-Please enter your name and student ID:
--Senuth 36180513
--
+-Senuth 36180513 : worked together in all
+-Hoorad 36166804 : worked together in all
 
 */
 module simple_proc (
@@ -28,9 +23,9 @@ module simple_proc (
 	output wire [15:0] R7
 );
 
-	//instruction opcodes, from the moodle x72 instruction table
-	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0]
-	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE)
+	//instruction opcodes
+	//type 1 is OPCODE Rx Ry, opcode = din[8:6], Rx = din[5:3], Ry = din[2:0], register to register
+	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE), register to immediate
 	//din is only ever sampled in DIN_READ (instruction) and BUS_WRITE_ONE (immediate), so it may change freely afterwards
 	localparam
 		INSTR_ADD = 3'b001,
@@ -218,7 +213,7 @@ module simple_proc (
 	//DIN_READ loads din into IR
 	//BUS_WRITE_ONE puts the immediate into Rx for movi, the immediate into A for addi (so din is not needed again),
 	//    and Rx into A for add and sub
-	//OPERATE_ALU puts Ry through the alu into G for add and sub, and Rx for addi (addition is commutative)
+	//OPERATE_ALU puts Ry through the alu into G for add and sub, and Rx for addi
 	//BUS_WRITE_TWO puts G into Rx
 	always @(*) begin
 		//default values
@@ -233,7 +228,7 @@ module simple_proc (
 		if (enable) begin
 			case (tick_FSM)
 
-				//fetch instruction
+				//get instruction
 				DIN_READ : ir_in = 1'b1;
 
 				BUS_WRITE_ONE : begin

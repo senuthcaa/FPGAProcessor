@@ -1,17 +1,12 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to decode the 16-bit display register into a signed decimal number
-    for HEX4 to HEX0, used by the Task 3 and Task 4 top levels.
 
-Please enter your name and student ID:
 -Hoorad 36166804
--
 
 */
 
 //converts a signed 16-bit value into a negative flag and 5 BCD digits
-//uses double dabble (shift and add 3) so that no divide or modulus circuits are needed
+//uses shift and add 3 so that no divide or modulus circuits are needed
 module signed_bcd (
 	input wire [15:0] value,
 	output wire negative,

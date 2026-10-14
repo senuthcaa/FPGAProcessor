@@ -1,20 +1,16 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement individual components to be used in
-    the CPU.
 
-Please enter your name and student ID:
--Senuth 36180513
--
+-Senuth 36180513: alu, register_n
+-Hoorad 36166804: sign_extend, tick_FSM, multiplexer 
 
 */
 module sign_extend(in, ext);
 	
-	input wire [8:0] in;
-   output wire [15:0] ext;
+	input wire [8:0] in; //assigning inputs
+   output wire [15:0] ext; //assigning outputs
 	
-	assign ext = {{7{in[8]}}, in};
+	assign ext = {{7{in[8]}}, in}; //take the MSB, and put 7 of them before the input to extend the input
  
 endmodule
 
@@ -22,7 +18,7 @@ endmodule
 
 module tick_FSM(rst, clk, enable, tick);
 
-	input wire rst;
+	input wire rst;	//assigning the inputs
 	input wire clk;
 	input wire enable;
 	
@@ -30,7 +26,7 @@ module tick_FSM(rst, clk, enable, tick);
 	reg [3:0] next_tick;
 	
 	localparam
-		DIN_READ = 4'b0001,
+		DIN_READ = 4'b0001,		//each tick is assigned an integer/ bit value (one hot coding each tick so each has a state)
 		BUS_WRITE_ONE = 4'b0010,
 		OPERATE_ALU = 4'b0100,
 		BUS_WRITE_TWO = 4'b1000;
@@ -48,7 +44,7 @@ module tick_FSM(rst, clk, enable, tick);
 	always @(*) begin
 		next_tick = tick;
 		case (tick)
-			DIN_READ : next_tick = BUS_WRITE_ONE;
+			DIN_READ : next_tick = BUS_WRITE_ONE;     //defining what comes after each tick 
 			BUS_WRITE_ONE : next_tick = OPERATE_ALU;
 			OPERATE_ALU : next_tick = BUS_WRITE_TWO;
 			BUS_WRITE_TWO : next_tick = DIN_READ;
@@ -110,12 +106,12 @@ module alu (
 		OP_SUB = 3'b010,
 		OP_SHF = 3'b011;
 
-	//+ or -
+	//add or subtrract
    wire do_sub = (alu_op == OP_SUB);
    wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b) + do_sub;
 
-   //bit-shifting, input_b is shifted by the signed amount in input_a (spec table 3)
-   //+ve input_a shifts input_b left (logical), -ve input_a shifts input_b right (arithmetic)
+   //bit-shifting - input b is shifted by the signed amount in input a
+   //positive input a shifts input b left (logical), negative input a shifts input b right (arithmetic)
    wire shift_right = input_a[15];
    wire [15:0] shift_distance = shift_right ? -input_a : input_a;
    wire saturate = |shift_distance[15:4]; //saturate is the boolean: true if shift_distance >= 16
@@ -125,8 +121,8 @@ module alu (
 	wire signed [15:0] shift_left_logical = input_b << true_shift_distance;
 
    wire [15:0] shifted = shift_right
-		/* shift right -> */? (saturate ? {16{input_b[15]}} : shift_right_arithmetic)
-		/* shift left -> */: (saturate ? 16'd0 : shift_left_logical);
+		/* shift right */? (saturate ? {16{input_b[15]}} : shift_right_arithmetic)
+		/* shift left */: (saturate ? 16'd0 : shift_left_logical);
 
    always @(*) begin
       case (alu_op)
