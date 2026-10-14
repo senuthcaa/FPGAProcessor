@@ -12,6 +12,8 @@
 transcript off
 onbreak {resume}
 onerror {resume}
+#do not open the testbench source window every time a testbench reaches its $stop
+quietly set PrefSource(OpenOnBreak) 0
 
 #test number, testbench, design shown in the summary, files to compile, expected result
 quietly set rt_tests {
@@ -42,13 +44,18 @@ proc rt_banner {text} {
 }
 
 #the project folder is the one with the broken files in it, simulation/modelsim has old copies of some files
+#if ModelSim is somewhere else, look for the "do <path>/run_tests.do" command that started this script
 proc rt_find_project {} {
 	if {[file exists broken_components.v]} { return 1 }
-	if {![catch {info script} s] && $s ne ""} {
-		set dir [file dirname [file normalize $s]]
-		if {[file exists [file join $dir broken_components.v]]} {
-			cd $dir
-			return 1
+	for {set i [info frame]} {$i >= 1} {incr i -1} {
+		if {[catch {info frame $i} f] || ![dict exists $f cmd]} { continue }
+		if {[regexp {(?:^|[;\s])do\s+"?([^\s;"]*run_tests\.do)} [dict get $f cmd] -> path]} {
+			set dir [file dirname [file normalize $path]]
+			if {[file exists [file join $dir broken_components.v]]} {
+				cd $dir
+				echo "run_tests.do: running in $dir"
+				return 1
+			}
 		}
 	}
 	return 0
@@ -56,10 +63,16 @@ proc rt_find_project {} {
 
 #compile the files into a fresh rt_work library, returns 0 if any file fails to compile
 proc rt_compile {files} {
-	if {[file exists rt_work]} { vdel -lib rt_work -all }
-	vlib rt_work
+	catch {quit -sim}
+	if {[file exists rt_work]} {
+		if {[catch {vdel -lib rt_work -all}]} { catch {file delete -force rt_work} }
+	}
+	if {[catch {vlib rt_work}]} {
+		echo "** could not create the rt_work library"
+		return 0
+	}
 	foreach f $files {
-		if {[catch {vlog -quiet -vlog01compat -work rt_work $f}]} {
+		if {[catch {vlog -quiet -nologo -vlog01compat -work rt_work $f}]} {
 			echo "** $f did not compile"
 			return 0
 		}
@@ -70,7 +83,8 @@ proc rt_compile {files} {
 #read an integer from the paused simulation, returns -1 if it cannot be read
 proc rt_int {path} {
 	if {[catch {examine -radix decimal $path} v]} { return -1 }
-	if {[regexp {(-?[0-9]+)} $v -> n]} { return $n }
+	set v [string trim $v]
+	if {[regexp {^-?[0-9]+$} $v]} { return $v }
 	return -1
 }
 
@@ -82,7 +96,10 @@ proc rt_run {num tb design files expect} {
 
 	if {![rt_compile $files]} { return [list -1 "compile error"] }
 	if {[catch {vsim -quiet -voptargs=+acc rt_work.$tb}]} { return [list -1 "could not load $tb"] }
-	run -all
+	if {[catch {run -all}]} {
+		catch {quit -sim}
+		return [list -1 "the simulation did not run"]
+	}
 
 	if {$tb eq "components_tb"} {
 		set fails 0
@@ -122,12 +139,13 @@ proc rt_run {num tb design files expect} {
 			if {[lindex $bad end] == $nsec} { append detail " (section $nsec is mul, ssi and disp)" }
 		}
 	}
-	quit -sim
+	catch {quit -sim}
 	return [list $fails $detail]
 }
 
 proc rt_main {} {
 	global rt_tests
+	catch {quit -sim}
 	if {![rt_find_project]} {
 		echo "run_tests.do: cd to the project folder (the one with components.v and broken_components.v) and run it again"
 		return
@@ -139,7 +157,10 @@ proc rt_main {} {
 		lassign [rt_run $num $tb $design $files $expect] fails detail
 		lappend results [list $num $tb $design $expect $fails $detail]
 	}
-	if {[file exists rt_work]} { vdel -lib rt_work -all }
+	catch {quit -sim}
+	if {[file exists rt_work]} {
+		if {[catch {vdel -lib rt_work -all}]} { catch {file delete -force rt_work} }
+	}
 
 	rt_banner "SUMMARY"
 	echo [format " %-5s %-18s %-24s %-9s %-7s %s" "Test" "Testbench" "Design" "Expected" "Result" "Details"]
