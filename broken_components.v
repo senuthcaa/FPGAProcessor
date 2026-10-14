@@ -1,0 +1,174 @@
+`timescale 1ns / 1ps
+/*
+
+-Senuth 36180513: alu, register_n
+-Hoorad 36166804: sign_extend, tick_FSM, multiplexer 
+
+This is a deliberately broken copy, used to show the testbenches catching bugs. Each bug is marked //BROKEN,
+    with the working code commented out just above the broken line, so each bug can be turned on or off on its own.
+    It has the same module names as the working file, so compile one or the other, never both.
+
+*/
+module sign_extend(in, ext);
+	
+	input wire [8:0] in; //assigning inputs
+   output wire [15:0] ext; //assigning outputs
+	
+	//BROKEN: fills the top 7 bits with 0 instead of copying the sign bit, so negative immediates become large positive numbers
+	//working line: assign ext = {{7{in[8]}}, in}; //take the MSB, and put 7 of them before the input to extend the input
+	assign ext = {7'b0000000, in};
+ 
+endmodule
+
+
+
+module tick_FSM(rst, clk, enable, tick);
+
+	input wire rst;	//assigning the inputs
+	input wire clk;
+	input wire enable;
+	
+	output reg [3:0] tick;
+	reg [3:0] next_tick;
+	
+	localparam
+		DIN_READ = 4'b0001,		//each tick is assigned an integer/ bit value (one hot coding each tick so each has a state)
+		BUS_WRITE_ONE = 4'b0010,
+		OPERATE_ALU = 4'b0100,
+		BUS_WRITE_TWO = 4'b1000;
+	
+	//state
+	always @(posedge clk) begin
+		if (rst) tick <= DIN_READ;
+		else begin
+			//BROKEN: ignores enable, so the tick keeps moving while the processor is meant to be paused
+			//working lines: if (enable) tick <= next_tick;
+			//               else tick <= tick;
+			tick <= next_tick;
+		end
+	end
+	
+	//next-state
+	always @(*) begin
+		next_tick = tick;
+		case (tick)
+			DIN_READ : next_tick = BUS_WRITE_ONE;     //defining what comes after each tick 
+			BUS_WRITE_ONE : next_tick = OPERATE_ALU;
+			OPERATE_ALU : next_tick = BUS_WRITE_TWO;
+			BUS_WRITE_TWO : next_tick = DIN_READ;
+			default : next_tick = DIN_READ;
+		endcase
+	end
+	
+endmodule
+
+
+
+module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
+
+	input wire [3:0] sel;
+	input wire [15:0] R0;
+	input wire [15:0] R1;
+	input wire [15:0] R2;
+	input wire [15:0] R3;
+	input wire [15:0] R4;
+	input wire [15:0] R5;
+	input wire [15:0] R6;
+	input wire [15:0] R7;
+	input wire [15:0] G;
+	input wire [15:0] SignExtDin;
+	output reg [15:0] Bus;
+	
+	
+	always @(*) begin
+		case (sel)
+			4'd0 : Bus = R0;
+			4'd1 : Bus = R1;
+			4'd2 : Bus = R2;
+			4'd3 : Bus = R3;
+			4'd4 : Bus = R4;
+			4'd5 : Bus = R5;
+			4'd6 : Bus = R6;
+			4'd7 : Bus = R7;
+			4'd8 : Bus = G;
+			4'd9 : Bus = SignExtDin;
+			default : Bus = SignExtDin;
+		endcase
+	end
+
+
+endmodule
+
+
+
+module alu (
+   input wire signed [15:0] input_a,
+   input wire signed [15:0] input_b,
+   input wire [2:0] alu_op,
+   output reg signed [15:0] result
+);
+
+   localparam
+		OP_MUL = 3'b000,
+		OP_ADD = 3'b001,
+		OP_SUB = 3'b010,
+		OP_SHF = 3'b011;
+
+	//add or subtrract
+   wire do_sub = (alu_op == OP_SUB);
+   //BROKEN: the + do_sub carry-in is missing, so sub gives one less than the right answer
+   //working line: wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b) + do_sub;
+   wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b);
+
+   //bit-shifting - input b is shifted by the signed amount in input a
+   //positive input a shifts input b left (logical), negative input a shifts input b right (arithmetic)
+   wire shift_right = input_a[15];
+   wire [15:0] shift_distance = shift_right ? -input_a : input_a;
+   wire saturate = |shift_distance[15:4]; //saturate is the boolean: true if shift_distance >= 16
+	wire [3:0] true_shift_distance = shift_distance[3:0];
+
+	wire signed [15:0] shift_right_arithmetic = input_b >>> true_shift_distance;
+	wire signed [15:0] shift_left_logical = input_b << true_shift_distance;
+
+   wire [15:0] shifted = shift_right
+		/* shift right */? (saturate ? {16{input_b[15]}} : shift_right_arithmetic)
+		/* shift left */: (saturate ? 16'd0 : shift_left_logical);
+
+   always @(*) begin
+      case (alu_op)
+			OP_MUL : result = input_a * input_b;
+         OP_ADD, OP_SUB : result = addsub;
+         OP_SHF : result = shifted;
+			default : result = 16'd0;
+		endcase
+   end
+
+endmodule
+
+
+
+module register_n(data_in, r_in, clk, Q, rst);
+
+
+	// To set parameter N during instantiation, you can use:
+	// register_n #(.N(num_bits)) reg_IR(.....), 
+	// where num_bits is how many bits you want to set N to
+	// and "..." is your usual input/output signals
+
+	parameter N = 16;
+
+	input wire [N-1:0] data_in;
+	input wire r_in;
+	input wire rst;
+	input wire clk;
+	output reg [N-1:0] Q;
+	
+	always @(posedge clk) begin
+		if (rst) Q <= {N{1'b0}};
+		else begin
+			if (r_in) Q <= data_in;
+			else Q <= Q;
+		end
+	end
+	
+endmodule
