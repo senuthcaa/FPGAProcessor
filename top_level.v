@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the DE10-Lite top level for Task 2,
-    which connects the simple x72 processor to the switches, keys, LEDs and HEX5.
 
-Please enter your name and student ID:
 -Senuth 36180513
--
+-Hoorad 36166804
 
 */
 module top_level (
@@ -17,12 +13,12 @@ module top_level (
 	output reg [6:0] HEX5
 );
 
-	//SW[8:0] -> processor din
-	//~KEY[0] -> synchronous processor rst
-	//~KEY[1] -> processor clk
-	//processor enable -> 1'b1
-	//bus[9:0] -> LEDR[9:0]
-	//tick_FSM -> HEX5
+	//SW[8:0] processor din
+	//~KEY[0] processor rst
+	//~KEY[1] processor clk
+	//processor enable 1'b1
+	//bus[9:0] LEDR[9:0]
+	//tick_FSM HEX5
 
 	//tick states, from components.v
 	localparam
@@ -43,7 +39,6 @@ module top_level (
 		.bus(bus),
 		.tick_FSM(tick),
 
-		//testbench outputs are not required on hardware
 		.R0(),
 		.R1(),
 		.R2(),
@@ -57,7 +52,7 @@ module top_level (
 	//display bottom 10 bits of processor bus on LEDs
 	assign LEDR = bus[9:0];
 
-	//display current tick on HEX5, de10-lite seven-segment displays are active-low
+	//display current tick on seven segment displays- are activelow
 	always @(*) begin
 		case (tick)
 			DIN_READ : HEX5 = 7'b1111001; //1

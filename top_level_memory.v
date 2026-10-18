@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the DE10-Lite top level for Task 4,
-    which connects the x72 processor to the instruction memory (ROM), the 50 MHz clock, the switches, keys, LEDs and HEX5 to HEX0.
 
-Please enter your name and student ID:
 -Senuth 36180513
--
+-Hoorad 36166804
 
 */
 module top_level_memory #(
@@ -27,17 +23,17 @@ module top_level_memory #(
 	output reg [6:0] HEX5
 );
 
-	//CLOCK_50 divided down to 10 Hz -> processor clk
-	//CLOCK_50 -> instruction memory clock
-	//SW[9] -> processor enable
-	//processor PC -> instruction memory address
-	//instruction memory q -> processor din
-	//~KEY[0] -> synchronous processor rst
-	//bus[9:0] -> LEDR[9:0]
-	//display -> HEX4 to HEX0 as a signed decimal, all five decimal points light when it is negative
-	//tick_FSM -> HEX5
+	//CLOCK_50 divided down to 10 Hz -processor clk
+	//CLOCK_50 -instruction memory clock
+	//SW[9] processor enable
+	//processor PC instruction memory address
+	//instruction memory q processor din
+	//~KEY[0] synchronous processor rst
+	//bus[9:0] LEDR[9:0]
+	//display HEX4 to HEX0 as a signed decimal, all five decimal points light when it is negative
+	//tick_FSM HEX5
 
-	//tick states, from components.v
+	//tick states from components.v
 	localparam
 		DIN_READ = 4'b0001,
 		BUS_WRITE_ONE = 4'b0010,
@@ -51,8 +47,8 @@ module top_level_memory #(
 	wire [15:0] display;
 	wire [3:0] tick;
 
-	//10 Hz processor clock, made by a counter on CLOCK_50 (see Lab 4)
-	//it comes from a register, not a push button, so it has no bounce and Quartus can put it on a global clock network
+	//10 Hz processor clock, made by a counter on CLOCK_50 (like Lab 4)
+	//it comes from a register, not a push button, so it has no bounce and Quartus can put it on a global clock
 	reg [21:0] div_count = 22'd0;
 	reg clk_10hz = 1'b0;
 
@@ -76,7 +72,7 @@ module top_level_memory #(
 
 	//instruction memory, clocked by CLOCK_50 as in the spec diagram
 	//the PC only changes on a 10 Hz edge and the ROM reads it again every 20 ns, so din holds the word at PC
-	//    long before the next 10 Hz edge
+	// before the next 10 Hz edge
 	instruction_ROM rom_inst (
 		.address(PC),
 		.clock(CLOCK_50),
@@ -93,7 +89,6 @@ module top_level_memory #(
 		.display(display),
 		.tick_FSM(tick),
 
-		//testbench outputs not required on hardware
 		.R0(),
 		.R1(),
 		.R2(),
@@ -119,7 +114,7 @@ module top_level_memory #(
 		.hex4(HEX4)
 	);
 
-	//display current tick on HEX5, de10-lite seven-segment displays are active-low
+	//display current tick on seven segment displays-  are active-low
 	always @(*) begin
 		case (tick)
 			DIN_READ : HEX5 = 7'b1111001; //1
