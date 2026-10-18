@@ -60,14 +60,19 @@ module top_level_memory #(
 		else div_count <= div_count + 22'd1;
 	end
 
-	//SW[9] and ~KEY[0] change at any time, so they are registered on the processor clock
+	//SW[9] and ~KEY[0] change at any time, so they pass through two cascaded registers on the processor clock
+	//the first register may go metastable, the second gives it a full clock period to settle
 	//every register in the processor then sees the same enable and rst at each edge
+	reg enable_meta = 1'b0;
 	reg enable_sync = 1'b0;
+	reg rst_meta = 1'b0;
 	reg rst_sync = 1'b0;
 
 	always @(posedge clk_10hz) begin
-		enable_sync <= SW[9];
-		rst_sync <= ~KEY[0];
+		enable_meta <= SW[9];
+		enable_sync <= enable_meta;
+		rst_meta <= ~KEY[0];
+		rst_sync <= rst_meta;
 	end
 
 	//instruction memory, clocked by CLOCK_50 as in the spec diagram

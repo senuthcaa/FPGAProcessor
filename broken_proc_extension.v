@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 /*
 
--Hoorad 36166804: all of file
+-Hoorad 36166804
 
 This is a deliberately broken copy, used to show the testbenches catching bugs. Each bug is marked //BROKEN,
     with the working code commented out just above the broken line, so each bug can be turned on or off on its own.
@@ -60,13 +60,6 @@ module extended_proc (
 	//mux select codes, from components.v
 	localparam
 		SEL_R0 = 4'd0,
-		SEL_R1 = 4'd1,
-		SEL_R2 = 4'd2,
-		SEL_R3 = 4'd3,
-		SEL_R4 = 4'd4,
-		SEL_R5 = 4'd5,
-		SEL_R6 = 4'd6,
-		SEL_R7 = 4'd7,
 		SEL_G = 4'd8,
 		SEL_DIN = 4'd9;
 
