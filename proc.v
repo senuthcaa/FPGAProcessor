@@ -28,10 +28,10 @@ module simple_proc (
 	//type 2 is OPCODE Rx xxx, the immediate value is presented on din on the next tick (BUS_WRITE_ONE), register to immediate
 	//din is only ever sampled in DIN_READ (instruction) and BUS_WRITE_ONE (immediate), so it may change freely afterwards
 	localparam
-		INSTR_ADD = 3'b001,
-		INSTR_ADDI = 3'b010,
-		INSTR_SUB = 3'b011,
-		INSTR_MOVI = 3'b111;
+		INSTR_ADD = 3'd1,
+		INSTR_ADDI = 3'd2,
+		INSTR_SUB = 3'd3,
+		INSTR_MOVI = 3'd7;
 
 	//alu op codes, from components.v
 	localparam
@@ -52,11 +52,11 @@ module simple_proc (
 		SEL_DIN = 4'd9;
 
 	//datapath vars
-	wire [8:0] IR;
-	wire [15:0] A;
-	wire [15:0] G;
+	wire [8:0] ir;
+	wire [15:0] a;
+	wire [15:0] g;
 
-	wire [15:0] SignExtDin;
+	wire [15:0] sign_ext_din;
 	wire [15:0] alu_result;
 
 	//control vars
@@ -72,13 +72,13 @@ module simple_proc (
 	wire [3:0] rx_sel;
 	wire [3:0] ry_sel;
 
-	assign rx_sel = {1'b0, IR[5:3]};
-	assign ry_sel = {1'b0, IR[2:0]};
+	assign rx_sel = {1'b0, ir[5:3]};
+	assign ry_sel = {1'b0, ir[2:0]};
 
 	//instantiate modules
 	sign_extend sign_ext_inst (
 		.in(din),
-		.ext(SignExtDin)
+		.ext(sign_ext_din)
 	);
 
 	tick_FSM tick_inst (
@@ -89,7 +89,7 @@ module simple_proc (
 	);
 
 	multiplexer mux_inst (
-		.SignExtDin(SignExtDin),
+		.SignExtDin(sign_ext_din),
 		.R0(R0),
 		.R1(R1),
 		.R2(R2),
@@ -98,47 +98,47 @@ module simple_proc (
 		.R5(R5),
 		.R6(R6),
 		.R7(R7),
-		.G(G),
+		.G(g),
 		.sel(mux_sel),
 		.Bus(bus)
 	);
 
 	alu alu_inst (
-		.input_a(A),
+		.input_a(a),
 		.input_b(bus),
 		.alu_op(alu_op),
 		.result(alu_result)
 	);
 
 	//instruction register
-	register_n #(.N(9)) reg_IR (
+	register_n #(.N(9)) reg_ir (
 		.data_in(din),
 		.r_in(ir_in),
 		.clk(clk),
-		.Q(IR),
+		.Q(ir),
 		.rst(rst)
 	);
 
 	//A register
-	register_n #(.N(16)) reg_A (
+	register_n #(.N(16)) reg_a (
 		.data_in(bus),
 		.r_in(a_in),
 		.clk(clk),
-		.Q(A),
+		.Q(a),
 		.rst(rst)
 	);
 
 	//G register
-	register_n #(.N(16)) reg_G (
+	register_n #(.N(16)) reg_g (
 		.data_in(alu_result),
 		.r_in(g_in),
 		.clk(clk),
-		.Q(G),
+		.Q(g),
 		.rst(rst)
 	);
 
 	//general purpose registers
-	register_n #(.N(16)) reg_R0 (
+	register_n #(.N(16)) reg_r0 (
 		.data_in(bus),
 		.r_in(r_in[0]),
 		.clk(clk),
@@ -146,7 +146,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R1 (
+	register_n #(.N(16)) reg_r1 (
 		.data_in(bus),
 		.r_in(r_in[1]),
 		.clk(clk),
@@ -154,7 +154,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R2 (
+	register_n #(.N(16)) reg_r2 (
 		.data_in(bus),
 		.r_in(r_in[2]),
 		.clk(clk),
@@ -162,7 +162,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R3 (
+	register_n #(.N(16)) reg_r3 (
 		.data_in(bus),
 		.r_in(r_in[3]),
 		.clk(clk),
@@ -170,7 +170,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R4 (
+	register_n #(.N(16)) reg_r4 (
 		.data_in(bus),
 		.r_in(r_in[4]),
 		.clk(clk),
@@ -178,7 +178,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R5 (
+	register_n #(.N(16)) reg_r5 (
 		.data_in(bus),
 		.r_in(r_in[5]),
 		.clk(clk),
@@ -186,7 +186,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R6 (
+	register_n #(.N(16)) reg_r6 (
 		.data_in(bus),
 		.r_in(r_in[6]),
 		.clk(clk),
@@ -194,7 +194,7 @@ module simple_proc (
 		.rst(rst)
 	);
 
-	register_n #(.N(16)) reg_R7 (
+	register_n #(.N(16)) reg_r7 (
 		.data_in(bus),
 		.r_in(r_in[7]),
 		.clk(clk),
@@ -225,11 +225,11 @@ module simple_proc (
 				DIN_READ : ir_in = 1'b1;
 
 				BUS_WRITE_ONE : begin
-					case (IR[8:6])
+					case (ir[8:6])
 						//movi Rx, immediate, which comes directly from din
 						INSTR_MOVI : begin
 							mux_sel = SEL_DIN;
-							r_in[IR[5:3]] = 1'b1;
+							r_in[ir[5:3]] = 1'b1;
 						end
 						//addi places the immediate into A
 						INSTR_ADDI : begin
@@ -246,7 +246,7 @@ module simple_proc (
 				end
 
 				OPERATE_ALU : begin
-					case (IR[8:6])
+					case (ir[8:6])
 						//add Rx, Ry
 						INSTR_ADD : begin
 							mux_sel = ry_sel;
@@ -270,11 +270,11 @@ module simple_proc (
 				end
 
 				BUS_WRITE_TWO : begin
-					case (IR[8:6])
+					case (ir[8:6])
 						//write the result in G back to Rx
 						INSTR_ADD, INSTR_ADDI, INSTR_SUB : begin
 							mux_sel = SEL_G;
-							r_in[IR[5:3]] = 1'b1;
+							r_in[ir[5:3]] = 1'b1;
 						end
 						default : mux_sel = SEL_R0;
 					endcase

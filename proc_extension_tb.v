@@ -24,53 +24,39 @@ module proc_extension_tb;
 		BUS_WRITE_TWO = 4'b1000;
 
 	//clock
-	reg clk = 1'b0;
-	always #10 clk = ~clk; //50MHz
+	reg clk;
+	initial begin
+		clk = 1'b0;
+		forever #10 clk = ~clk; //50MHz
+	end
 
 	//processor vars
 	reg rst;
 	reg enable;
 	reg [8:0] din;
-	wire [15:0] bus_DUT;
-	wire [15:0] display_DUT;
-	wire [3:0] tick_FSM_DUT;
-	wire [15:0] R0_DUT, R1_DUT, R2_DUT, R3_DUT, R4_DUT, R5_DUT, R6_DUT, R7_DUT;
-
-	//section completion flags, each test waits for the one before it, and the simulation ends once all are set
-	reg reset_done = 1'b0;
-	reg tick_done = 1'b0;
-	reg movi_done = 1'b0;
-	reg addi_done = 1'b0;
-	reg mul_done = 1'b0;
-	reg ssi_done = 1'b0;
-	reg disp_done = 1'b0;
+	wire [15:0] bus_dut;
+	wire [15:0] display_dut;
+	wire [3:0] tick_fsm_dut;
+	wire [15:0] r0_dut, r1_dut, r2_dut, r3_dut, r4_dut, r5_dut, r6_dut, r7_dut;
 
 	//instantiate modules
-	extended_proc proc_DUT (
+	extended_proc proc_dut (
 		.clk(clk),
 		.rst(rst),
 		.enable(enable),
 		.din(din),
-		.bus(bus_DUT),
-		.display(display_DUT),
-		.tick_FSM(tick_FSM_DUT),
-		.R0(R0_DUT),
-		.R1(R1_DUT),
-		.R2(R2_DUT),
-		.R3(R3_DUT),
-		.R4(R4_DUT),
-		.R5(R5_DUT),
-		.R6(R6_DUT),
-		.R7(R7_DUT)
+		.bus(bus_dut),
+		.display(display_dut),
+		.tick_FSM(tick_fsm_dut),
+		.R0(r0_dut),
+		.R1(r1_dut),
+		.R2(r2_dut),
+		.R3(r3_dut),
+		.R4(r4_dut),
+		.R5(r5_dut),
+		.R6(r6_dut),
+		.R7(r7_dut)
 	);
-
-
-	//initialise variables
-	initial begin
-		rst             = 1'b0;
-		enable          = 1'b1;
-		din             = 9'd0;
-	end
 
 
 	//everything between the two directives is simulation only, quartus skips it and modelsim still runs it
@@ -80,7 +66,7 @@ module proc_extension_tb;
 	//SHARED TASKS
 
 	//expected contents of R0 to R7
-	reg [15:0] regs_TRUE [0:7];
+	reg [15:0] regs_true [0:7];
 
 	//the test that is running and the instruction it is on, printed with every failure
 	reg [8*8-1:0] test_name;
@@ -88,20 +74,20 @@ module proc_extension_tb;
 	integer test_errors;
 
 	//16-bit LFSR, x^16 + x^14 + x^13 + x^11 + 1, gives random values for din in the ticks where it should be ignored
-	reg [15:0] lfsr = 16'hACE1;
+	reg [15:0] lfsr;
 
 	function [15:0] dut_reg;
 		input [2:0] idx;
 		begin
 			case (idx)
-				3'd0 : dut_reg = R0_DUT;
-				3'd1 : dut_reg = R1_DUT;
-				3'd2 : dut_reg = R2_DUT;
-				3'd3 : dut_reg = R3_DUT;
-				3'd4 : dut_reg = R4_DUT;
-				3'd5 : dut_reg = R5_DUT;
-				3'd6 : dut_reg = R6_DUT;
-				default : dut_reg = R7_DUT;
+				3'd0 : dut_reg = r0_dut;
+				3'd1 : dut_reg = r1_dut;
+				3'd2 : dut_reg = r2_dut;
+				3'd3 : dut_reg = r3_dut;
+				3'd4 : dut_reg = r4_dut;
+				3'd5 : dut_reg = r5_dut;
+				3'd6 : dut_reg = r6_dut;
+				default : dut_reg = r7_dut;
 			endcase
 		end
 	endfunction
@@ -163,22 +149,22 @@ module proc_extension_tb;
 	task check_tick;
 		input [3:0] expected;
 		begin
-			if (tick_FSM_DUT !== expected) begin
+			if (tick_fsm_dut !== expected) begin
 				test_errors = test_errors + 1;
-				$display("%0s FAIL at t=%0t during %0s: tick got=%b expected=%b",test_name,$time,instr_text,tick_FSM_DUT,expected);
+				$display("%0s FAIL at t=%0t during %0s: tick got=%b expected=%b",test_name,$time,instr_text,tick_fsm_dut,expected);
 			end
 		end
 	endtask
 
-	//compares R0 to R7 with regs_TRUE
+	//compares R0 to R7 with regs_true
 	task check_regs;
 		input [8*24-1:0] label;
 		integer reg_counter;
 		begin
 			for (reg_counter = 0; reg_counter < 8; reg_counter = reg_counter + 1) begin
-				if (dut_reg(reg_counter) !== regs_TRUE[reg_counter]) begin
+				if (dut_reg(reg_counter) !== regs_true[reg_counter]) begin
 					test_errors = test_errors + 1;
-					$display("%0s FAIL at t=%0t during %0s: R%0d %0s got=%0d (%h) expected=%0d (%h)",test_name,$time,instr_text,reg_counter,label,$signed(dut_reg(reg_counter)),dut_reg(reg_counter),$signed(regs_TRUE[reg_counter]),regs_TRUE[reg_counter]);
+					$display("%0s FAIL at t=%0t during %0s: R%0d %0s got=%0d (%h) expected=%0d (%h)",test_name,$time,instr_text,reg_counter,label,$signed(dut_reg(reg_counter)),dut_reg(reg_counter),$signed(regs_true[reg_counter]),regs_true[reg_counter]);
 				end
 			end
 		end
@@ -195,7 +181,7 @@ module proc_extension_tb;
 			rst = 1'b1;
 			tick_edge;
 			rst = 1'b0;
-			for (reg_counter = 0; reg_counter < 8; reg_counter = reg_counter + 1) regs_TRUE[reg_counter] = 16'd0;
+			for (reg_counter = 0; reg_counter < 8; reg_counter = reg_counter + 1) regs_true[reg_counter] = 16'd0;
 		end
 	endtask
 
@@ -208,7 +194,7 @@ module proc_extension_tb;
 		reg [15:0] result;
 		begin
 			imm_ext = {{7{imm[8]}}, imm};
-			if (op == INSTR_ADDI) result = regs_TRUE[rx] + imm_ext;
+			if (op == INSTR_ADDI) result = regs_true[rx] + imm_ext;
 			else result = imm_ext;
 			set_instr_text({op, rx, 3'd0}, imm);
 
@@ -223,29 +209,29 @@ module proc_extension_tb;
 			din = imm;
 			#1;
 			check_tick(BUS_WRITE_ONE);
-			check_value("bus in tick 2", bus_DUT, imm_ext);
+			check_value("bus in tick 2", bus_dut, imm_ext);
 			check_regs("in tick 2");
 			tick_edge;
 
 			//movi writes Rx at the end of tick 2
-			if (op == INSTR_MOVI) regs_TRUE[rx] = result;
+			if (op == INSTR_MOVI) regs_true[rx] = result;
 
 			//tick 3, addi puts Rx on the bus
 			scramble_din;
 			check_tick(OPERATE_ALU);
-			if (op == INSTR_ADDI) check_value("bus in tick 3", bus_DUT, regs_TRUE[rx]);
+			if (op == INSTR_ADDI) check_value("bus in tick 3", bus_dut, regs_true[rx]);
 			check_regs("in tick 3");
 			tick_edge;
 
 			//tick 4, addi puts the result on the bus
 			scramble_din;
 			check_tick(BUS_WRITE_TWO);
-			if (op == INSTR_ADDI) check_value("bus in tick 4", bus_DUT, result);
+			if (op == INSTR_ADDI) check_value("bus in tick 4", bus_dut, result);
 			check_regs("in tick 4");
 			tick_edge;
 
 			//back to tick 1, Rx holds the result
-			regs_TRUE[rx] = result;
+			regs_true[rx] = result;
 			check_tick(DIN_READ);
 			check_regs("after the instruction");
 		end
@@ -267,112 +253,38 @@ module proc_extension_tb;
 	endtask
 
 
-	//RESET TEST
+	//TEST RESULTS
 
 	integer reset_errors;
-
-	initial begin
-
-		//waits for the initialise block to finish before overwriting the inputs
-		#1;
-
-		//every register starts unknown, one rst edge must clear them all
-		start_test("reset");
-		check_tick(DIN_READ);
-		check_regs("after reset");
-		check_value("bus after reset", bus_DUT, 16'd0);
-
-		reset_errors = test_errors;
-		if (reset_errors != 0) $display("reset: %0d checks failed", reset_errors);
-
-		reset_done = 1'b1;
-
-	end
-
-
-	//TICK FSM TEST
+	integer tick_errors;
+	integer movi_errors;
+	integer addi_errors;
+	integer mul_errors;
+	integer ssi_errors;
+	integer disp_errors;
 
 	integer tick_counter;
-	integer tick_errors;
+	integer addi_counter;
 
 	//expected tick order, starting from DIN_READ
-	reg [3:0] tick_TRUE [0:3];
-
-	initial begin
-
-		tick_TRUE[0] = DIN_READ;
-		tick_TRUE[1] = BUS_WRITE_ONE;
-		tick_TRUE[2] = OPERATE_ALU;
-		tick_TRUE[3] = BUS_WRITE_TWO;
-
-		wait (reset_done);
-		start_test("tick FSM");
-
-		//3 runs of add r0, r0, which leaves every register at 0, the tick must cycle through all 4 states in order
-		din = {INSTR_ADD, 3'd0, 3'd0};
-		set_instr_text(din, 9'd0);
-		#1;
-		for (tick_counter = 0; tick_counter < 12; tick_counter = tick_counter + 1) begin
-			check_tick(tick_TRUE[tick_counter % 4]);
-			tick_edge;
-		end
-
-		tick_errors = test_errors;
-		if (tick_errors != 0) $display("tick FSM: %0d checks failed", tick_errors);
-
-		tick_done = 1'b1;
-
-	end
-
-
-	//MOVI TEST
-
-	integer movi_errors;
-
-	initial begin
-
-		wait (tick_done);
-		start_test("movi");
-
-		//every register, with the largest and smallest immediates
-		exec_type2(INSTR_MOVI, 3'd0, 9'h000);
-		check_value("R0", R0_DUT, 16'd0);
-		exec_type2(INSTR_MOVI, 3'd1, 9'h001);
-		check_value("R1", R1_DUT, 16'd1);
-		exec_type2(INSTR_MOVI, 3'd2, 9'h0FF); //255, the largest immediate
-		check_value("R2", R2_DUT, 16'd255);
-		exec_type2(INSTR_MOVI, 3'd3, 9'h1FF); //-1
-		check_value("R3", R3_DUT, 16'hFFFF);
-		exec_type2(INSTR_MOVI, 3'd4, 9'h100); //-256, the smallest immediate
-		check_value("R4", R4_DUT, 16'hFF00);
-		exec_type2(INSTR_MOVI, 3'd5, 9'h07F); //127
-		check_value("R5", R5_DUT, 16'd127);
-		exec_type2(INSTR_MOVI, 3'd6, 9'h181); //-127
-		check_value("R6", R6_DUT, 16'hFF81);
-		exec_type2(INSTR_MOVI, 3'd7, 9'h0AA); //170
-		check_value("R7", R7_DUT, 16'd170);
-
-		//overwrite a register that is not 0
-		exec_type2(INSTR_MOVI, 3'd3, 9'h055); //85
-		check_value("R3", R3_DUT, 16'd85);
-
-		movi_errors = test_errors;
-		if (movi_errors != 0) $display("movi: %0d checks failed", movi_errors);
-
-		movi_done = 1'b1;
-
-	end
-
-
-	//ADDI TEST
-
-	integer addi_counter;
-	integer addi_errors;
+	reg [3:0] tick_true [0:3];
 
 	//R0 to R7 are loaded with 5, -9, 100, -100, 255, -256, 77, 33 before the addi instructions
 	reg [8:0] addi_seed [0:7];
 
+	//the tests share one processor, so they run one after another in this block, which is the only one that drives its inputs
 	initial begin
+
+		//initialise variables
+		rst = 1'b0;
+		enable = 1'b1;
+		din = 9'd0;
+		lfsr = 16'hACE1;
+
+		tick_true[0] = DIN_READ;
+		tick_true[1] = BUS_WRITE_ONE;
+		tick_true[2] = OPERATE_ALU;
+		tick_true[3] = BUS_WRITE_TWO;
 
 		addi_seed[0] = 9'h005;
 		addi_seed[1] = 9'h1F7;
@@ -383,127 +295,153 @@ module proc_extension_tb;
 		addi_seed[6] = 9'h04D;
 		addi_seed[7] = 9'h021;
 
-		wait (movi_done);
+
+		//RESET TEST
+
+		//every register starts unknown, one rst edge must clear them all
+		start_test("reset");
+		check_tick(DIN_READ);
+		check_regs("after reset");
+		check_value("bus after reset", bus_dut, 16'd0);
+
+		reset_errors = test_errors;
+		if (reset_errors != 0) $display("reset: %0d checks failed", reset_errors);
+
+
+		//TICK FSM TEST
+
+		start_test("tick FSM");
+
+		//3 runs of add r0, r0, which leaves every register at 0, the tick must cycle through all 4 states in order
+		din = {INSTR_ADD, 3'd0, 3'd0};
+		set_instr_text(din, 9'd0);
+		#1;
+		for (tick_counter = 0; tick_counter < 12; tick_counter = tick_counter + 1) begin
+			check_tick(tick_true[tick_counter % 4]);
+			tick_edge;
+		end
+
+		tick_errors = test_errors;
+		if (tick_errors != 0) $display("tick FSM: %0d checks failed", tick_errors);
+
+
+		//MOVI TEST
+
+		start_test("movi");
+
+		//every register, with the largest and smallest immediates
+		exec_type2(INSTR_MOVI, 3'd0, 9'h000);
+		check_value("R0", r0_dut, 16'd0);
+		exec_type2(INSTR_MOVI, 3'd1, 9'h001);
+		check_value("R1", r1_dut, 16'd1);
+		exec_type2(INSTR_MOVI, 3'd2, 9'h0FF); //255, the largest immediate
+		check_value("R2", r2_dut, 16'd255);
+		exec_type2(INSTR_MOVI, 3'd3, 9'h1FF); //-1
+		check_value("R3", r3_dut, 16'hFFFF);
+		exec_type2(INSTR_MOVI, 3'd4, 9'h100); //-256, the smallest immediate
+		check_value("R4", r4_dut, 16'hFF00);
+		exec_type2(INSTR_MOVI, 3'd5, 9'h07F); //127
+		check_value("R5", r5_dut, 16'd127);
+		exec_type2(INSTR_MOVI, 3'd6, 9'h181); //-127
+		check_value("R6", r6_dut, 16'hFF81);
+		exec_type2(INSTR_MOVI, 3'd7, 9'h0AA); //170
+		check_value("R7", r7_dut, 16'd170);
+
+		//overwrite a register that is not 0
+		exec_type2(INSTR_MOVI, 3'd3, 9'h055); //85
+		check_value("R3", r3_dut, 16'd85);
+
+		movi_errors = test_errors;
+		if (movi_errors != 0) $display("movi: %0d checks failed", movi_errors);
+
+
+		//ADDI TEST
+
 		start_test("addi");
 
 		for (addi_counter = 0; addi_counter < 8; addi_counter = addi_counter + 1) exec_type2(INSTR_MOVI, addi_counter, addi_seed[addi_counter]);
 
 		//+0
 		exec_type2(INSTR_ADDI, 3'd0, 9'h000); //5 + 0
-		check_value("R0", R0_DUT, 16'd5);
+		check_value("R0", r0_dut, 16'd5);
 
 		//result of 0
 		exec_type2(INSTR_ADDI, 3'd1, 9'h009); //-9 + 9
-		check_value("R1", R1_DUT, 16'd0);
+		check_value("R1", r1_dut, 16'd0);
 
 		//pos+pos, the largest immediate
 		exec_type2(INSTR_ADDI, 3'd2, 9'h0FF); //100 + 255
-		check_value("R2", R2_DUT, 16'd355);
+		check_value("R2", r2_dut, 16'd355);
 
 		//neg+neg, the smallest immediate
 		exec_type2(INSTR_ADDI, 3'd3, 9'h100); //-100 + -256
-		check_value("R3", R3_DUT, 16'hFE9C);
+		check_value("R3", r3_dut, 16'hFE9C);
 
 		//pos+neg
 		exec_type2(INSTR_ADDI, 3'd4, 9'h1FF); //255 + -1
-		check_value("R4", R4_DUT, 16'd254);
+		check_value("R4", r4_dut, 16'd254);
 
 		//neg+pos
 		exec_type2(INSTR_ADDI, 3'd5, 9'h0FF); //-256 + 255
-		check_value("R5", R5_DUT, 16'hFFFF);
+		check_value("R5", r5_dut, 16'hFFFF);
 
 		//a+(-a)
 		exec_type2(INSTR_ADDI, 3'd7, 9'h1DF); //33 + -33
-		check_value("R7", R7_DUT, 16'd0);
+		check_value("R7", r7_dut, 16'd0);
 
 		addi_errors = test_errors;
 		if (addi_errors != 0) $display("addi: %0d checks failed", addi_errors);
 
-		addi_done = 1'b1;
 
-	end
+		//MUL TEST
 
-
-	//MUL TEST
-
-	integer mul_errors;
-
-	initial begin
-
-		wait (addi_done);
 		start_test("mul");
 
 		//pos*neg, 6 * -7 = -42
 		run_instr({INSTR_MOVI, 3'd1, 3'd0}, 9'd6);
 		run_instr({INSTR_MOVI, 3'd2, 3'd0}, 9'h1F9); //-7
 		run_instr({INSTR_MUL, 3'd1, 3'd2}, 9'd0);
-		check_value("R1", R1_DUT, 16'hFFD6);
+		check_value("R1", r1_dut, 16'hFFD6);
 
 		mul_errors = test_errors;
 		if (mul_errors != 0) $display("mul: %0d checks failed", mul_errors);
 
-		mul_done = 1'b1;
 
-	end
+		//SSI TEST
 
-
-	//SSI TEST
-
-	integer ssi_errors;
-
-	initial begin
-
-		wait (mul_done);
 		start_test("ssi");
 
 		//shift left, 5 shifted left by 3 = 40
 		run_instr({INSTR_MOVI, 3'd3, 3'd0}, 9'd5);
 		run_instr({INSTR_SSI, 3'd3, 3'd0}, 9'd3);
-		check_value("R3", R3_DUT, 16'd40);
+		check_value("R3", r3_dut, 16'd40);
 
 		//shift right, 40 shifted right by 2 = 10
 		run_instr({INSTR_SSI, 3'd3, 3'd0}, 9'h1FE); //-2
-		check_value("R3", R3_DUT, 16'd10);
+		check_value("R3", r3_dut, 16'd10);
 
 		ssi_errors = test_errors;
 		if (ssi_errors != 0) $display("ssi: %0d checks failed", ssi_errors);
 
-		ssi_done = 1'b1;
 
-	end
+		//DISP TEST
 
-
-	//DISP TEST
-
-	integer disp_errors;
-
-	initial begin
-
-		wait (ssi_done);
 		start_test("disp");
 
 		//display shows R3
 		run_instr({INSTR_MOVI, 3'd3, 3'd0}, 9'd10);
 		run_instr({INSTR_DISP, 3'd3, 3'd0}, 9'd0);
-		check_value("display", display_DUT, 16'd10);
+		check_value("display", display_dut, 16'd10);
 
 		//display keeps its value after R3 changes, until the next disp
 		run_instr({INSTR_ADDI, 3'd3, 3'd0}, 9'd1);
-		check_value("display", display_DUT, 16'd10);
+		check_value("display", display_dut, 16'd10);
 
 		disp_errors = test_errors;
 		if (disp_errors != 0) $display("disp: %0d checks failed", disp_errors);
 
-		disp_done = 1'b1;
 
-	end
-
-
-	//SIMULATION END
-
-	initial begin
-
-		wait (reset_done && tick_done && movi_done && addi_done && mul_done && ssi_done && disp_done);
+		//SIMULATION END
 
 		$display("==TEST SUMMARY==");
 		$display("reset : %0d failed", reset_errors);

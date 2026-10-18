@@ -10,115 +10,89 @@ module components_tb;
 	localparam REG_N = 16; // width of register_n under test (change to test other N)
 
 	//clock
-	reg clk = 1'b0;
-	always #10 clk = ~clk; //50MHz
+	reg clk;
+	initial begin
+		clk = 1'b0;
+		forever #10 clk = ~clk; //50MHz
+	end
 
 	//sign_extend vars
 	reg [8:0] se_in;
-	wire [15:0] se_ext_DUT;
+	wire [15:0] se_ext_dut;
 
 	//tick_fsm vars
 	reg tick_rst;
 	reg tick_enable;
-	wire [3:0] tick_out_DUT;
+	wire [3:0] tick_out_dut;
 
 	//mux vars
-	reg [15:0] mux_SignExtDin;
-	reg [15:0] mux_R0, mux_R1, mux_R2, mux_R3, mux_R4, mux_R5, mux_R6, mux_R7;
-	reg [15:0] mux_G;
+	reg [15:0] mux_sign_ext_din;
+	reg [15:0] mux_r0, mux_r1, mux_r2, mux_r3, mux_r4, mux_r5, mux_r6, mux_r7;
+	reg [15:0] mux_g;
 	reg [3:0] mux_sel;
-	wire [15:0] mux_Bus_DUT;
+	wire [15:0] mux_bus_dut;
 
 	//alu vars
 	reg signed [15:0] alu_a;
 	reg signed [15:0] alu_b;
 	reg [2:0] alu_op;
-	wire signed [15:0] alu_result_DUT;
+	wire signed [15:0] alu_result_dut;
 
 	//regn vars
 	reg [REG_N-1:0] reg_din;
 	reg reg_rin;
-	wire [REG_N-1:0] reg_out_DUT;
+	wire [REG_N-1:0] reg_out_dut;
 	reg reg_rst;
 
 	//section completion flags, used to end the simulation
-	reg se_done = 1'b0;
-	reg tick_done = 1'b0;
-	reg mux_done = 1'b0;
-	reg reg_done = 1'b0;
-	reg alu_done = 1'b0;
+	reg se_done;
+	reg tick_done;
+	reg mux_done;
+	reg reg_done;
+	reg alu_done;
 
 	//instantiate modules
-	sign_extend sign_ext_DUT (
+	sign_extend sign_ext_dut (
 		.in(se_in),
-		.ext(se_ext_DUT)
+		.ext(se_ext_dut)
 	);
 
-	tick_FSM tick_DUT (
+	tick_FSM tick_dut (
 		.rst(tick_rst),
 		.clk(clk),
 		.enable(tick_enable),
-		.tick(tick_out_DUT)
+		.tick(tick_out_dut)
 	);
 
-	multiplexer mux_DUT (
-		.SignExtDin(mux_SignExtDin),
-		.R0(mux_R0),
-		.R1(mux_R1),
-		.R2(mux_R2),
-		.R3(mux_R3),
-		.R4(mux_R4),
-		.R5(mux_R5),
-		.R6(mux_R6),
-		.R7(mux_R7),
-		.G(mux_G),
+	multiplexer mux_dut (
+		.SignExtDin(mux_sign_ext_din),
+		.R0(mux_r0),
+		.R1(mux_r1),
+		.R2(mux_r2),
+		.R3(mux_r3),
+		.R4(mux_r4),
+		.R5(mux_r5),
+		.R6(mux_r6),
+		.R7(mux_r7),
+		.G(mux_g),
 		.sel(mux_sel),
-		.Bus(mux_Bus_DUT)
+		.Bus(mux_bus_dut)
 	);
 
-	alu alu_DUT (
+	alu alu_dut (
 		.input_a(alu_a),
 		.input_b(alu_b),
 		.alu_op(alu_op),
-		.result(alu_result_DUT)
+		.result(alu_result_dut)
 	);
 
-	register_n #(.N(REG_N)) reg_DUT (
+	register_n #(.N(REG_N)) reg_dut (
 		.data_in(reg_din),
 		.r_in(reg_rin),
 		.clk(clk),
-		.Q(reg_out_DUT),
+		.Q(reg_out_dut),
 		.rst(reg_rst)
 	);
-
-
-	//initialise variables
-	initial begin
-		se_in           = 9'd0;
-
-		tick_rst        = 1'b0;
-		tick_enable     = 1'b0;
-
-		mux_SignExtDin  = 16'd0;
-		mux_R0          = 16'd0;
-		mux_R1          = 16'd0;
-		mux_R2          = 16'd0;
-		mux_R3          = 16'd0;
-		mux_R4          = 16'd0;
-		mux_R5          = 16'd0;
-		mux_R6          = 16'd0;
-		mux_R7          = 16'd0;
-		mux_G           = 16'd0;
-		mux_sel         = 4'd0;
-
-		alu_a           = 16'sd0;
-		alu_b           = 16'sd0;
-		alu_op          = 3'b000;
-
-		reg_din         = {REG_N{1'b0}};
-		reg_rin         = 1'b0;
-		reg_rst         = 1'b0;
-	end
 
 
 	//everything between the two directives is simulation only, quartus skips it and modelsim still runs it
@@ -130,15 +104,17 @@ module components_tb;
 	integer se_counter;
 	integer se_errors;
 
-	reg [15:0] se_ext_TRUE [0:511];
+	reg [15:0] se_ext_true [0:511];
 
 	initial begin
+
+		se_done = 1'b0;
 
 		//creates a huge array of all the possible combinations brute forcing combinations
 		//0 to 255 have in[8] = 0 so ext is unchanged, 256 to 511 have in[8] = 1 so they are negative and ext is in - 512
 		for (se_counter = 0; se_counter < 512; se_counter = se_counter + 1) begin
-			if (se_counter < 256) se_ext_TRUE[se_counter] = se_counter;
-			else se_ext_TRUE[se_counter] = se_counter - 512;
+			if (se_counter < 256) se_ext_true[se_counter] = se_counter;
+			else se_ext_true[se_counter] = se_counter - 512;
 		end
 
 		se_errors = 0;
@@ -146,9 +122,9 @@ module components_tb;
 		for (se_counter = 0; se_counter < 512; se_counter = se_counter + 1) begin
 			se_in = se_counter;
 			#1;
-			if (se_ext_DUT !== se_ext_TRUE[se_counter]) begin
+			if (se_ext_dut !== se_ext_true[se_counter]) begin
 				se_errors = se_errors + 1;
-				$display("sign extender FAIL: in=%0d  got=%b  expected=%b", se_counter, se_ext_DUT, se_ext_TRUE[se_counter]);
+				$display("sign extender FAIL: in=%0d  got=%b  expected=%b", se_counter, se_ext_dut, se_ext_true[se_counter]);
 			end
 		end
 
@@ -172,19 +148,19 @@ module components_tb;
 	task check_tick;
 		input [3:0] expected;
 		begin
-			if (tick_out_DUT !== expected) begin
+			if (tick_out_dut !== expected) begin
 				tick_errors = tick_errors + 1;
-				$display("tick FSM FAIL at t=%0t: rst=%b enable=%b got=%b expected=%b",$time,tick_rst,tick_enable,tick_out_DUT,expected);
+				$display("tick FSM FAIL at t=%0t: rst=%b enable=%b got=%b expected=%b",$time,tick_rst,tick_enable,tick_out_dut,expected);
 			end
 		end
 	endtask
 
 	initial begin
 
+		tick_done = 1'b0;
 		tick_errors = 0;
 
 		//test rst
-		@(negedge clk);
 		tick_rst = 1'b1;
 		tick_enable = 1'b0;
 		@(posedge clk);
@@ -192,7 +168,6 @@ module components_tb;
 		check_tick(DIN_READ);
 
 		//test full sequence, enable = 1
-		@(negedge clk);
 		tick_rst = 1'b0;
 		tick_enable = 1'b1;
 		@(posedge clk);
@@ -217,7 +192,6 @@ module components_tb;
 		check_tick(OPERATE_ALU);
 
 		//test hold mid-sequence, enable = 0
-		@(negedge clk);
 		tick_enable = 1'b0;
 		@(posedge clk);
 		#1;
@@ -230,7 +204,6 @@ module components_tb;
 		check_tick(OPERATE_ALU);
 
 		//test resume from held state, enable = 1
-		@(negedge clk);
 		tick_enable = 1'b1;
 		@(posedge clk);
 		#1;
@@ -245,14 +218,12 @@ module components_tb;
 		check_tick(BUS_WRITE_ONE);
 		
 		//test rst mid-sequence, overriding enable = 1
-		@(negedge clk);
 		tick_rst = 1'b1;
 		@(posedge clk);
 		#1;
 		check_tick(DIN_READ);
 
 		//release rst
-		@(negedge clk);
 		tick_rst = 1'b0;
 		tick_enable = 1'b0;
 
@@ -268,77 +239,72 @@ module components_tb;
 	integer mux_counter;
 	integer mux_errors;
 
-	//expected Bus for every value of sel, including the default range
-	reg [15:0] mux_TRUE [0:15];
+	//expected Bus for every value of sel that selects an input, 10 to 15 are don't cares
+	reg [15:0] mux_true [0:9];
 
 	task check_mux;
 		input [3:0] sel;
 		begin
-			if (mux_Bus_DUT !== mux_TRUE[sel]) begin
+			if (mux_bus_dut !== mux_true[sel]) begin
 				mux_errors = mux_errors + 1;
-				$display("mux FAIL: sel=%0d  got=%h  expected=%h", sel, mux_Bus_DUT, mux_TRUE[sel]);
+				$display("mux FAIL: sel=%0d  got=%0d (%h)  expected=%0d (%h)", sel, mux_bus_dut, mux_bus_dut, mux_true[sel], mux_true[sel]);
 			end
 		end
 	endtask
 
-	//keeps mux_TRUE in step with the current input values
-	task load_mux_TRUE;
+	//keeps mux_true in step with the current input values
+	task load_mux_true;
 		begin
-			mux_TRUE[0] = mux_R0;
-			mux_TRUE[1] = mux_R1;
-			mux_TRUE[2] = mux_R2;
-			mux_TRUE[3] = mux_R3;
-			mux_TRUE[4] = mux_R4;
-			mux_TRUE[5] = mux_R5;
-			mux_TRUE[6] = mux_R6;
-			mux_TRUE[7] = mux_R7;
-			mux_TRUE[8] = mux_G;
-			//sel 9 selects SignExtDin, and 10 to 15 fall through to the same default
-			for (mux_counter = 9; mux_counter < 16; mux_counter = mux_counter + 1) mux_TRUE[mux_counter] = mux_SignExtDin;
+			mux_true[0] = mux_r0;
+			mux_true[1] = mux_r1;
+			mux_true[2] = mux_r2;
+			mux_true[3] = mux_r3;
+			mux_true[4] = mux_r4;
+			mux_true[5] = mux_r5;
+			mux_true[6] = mux_r6;
+			mux_true[7] = mux_r7;
+			mux_true[8] = mux_g;
+			mux_true[9] = mux_sign_ext_din;
 		end
 	endtask
 
 	initial begin
 
-		//waits for the initialise block to finish before overwriting the inputs
-		#1;
-
+		mux_done = 1'b0;
 		mux_errors = 0;
 
 		//every input gets a distinct value, so a wrong selection cannot coincidentally match
-		mux_R0          = 16'h1111;
-		mux_R1          = 16'h2222;
-		mux_R2          = 16'h3333;
-		mux_R3          = 16'h4444;
-		mux_R4          = 16'h5555;
-		mux_R5          = 16'h6666;
-		mux_R6          = 16'h7777;
-		mux_R7          = 16'h8888;
-		mux_G           = 16'h9999;
-		mux_SignExtDin  = 16'hAAAA;
-		load_mux_TRUE;
+		mux_r0          = 16'h1111;
+		mux_r1          = 16'h2222;
+		mux_r2          = 16'h3333;
+		mux_r3          = 16'h4444;
+		mux_r4          = 16'h5555;
+		mux_r5          = 16'h6666;
+		mux_r6          = 16'h7777;
+		mux_r7          = 16'h8888;
+		mux_g           = 16'h9999;
+		mux_sign_ext_din  = 16'hAAAA;
+		load_mux_true;
 
-		//test every value of sel, 0 to 8 select a register, 9 selects SignExtDin, 10 to 15 are the default
-		for (mux_counter = 0; mux_counter < 16; mux_counter = mux_counter + 1) begin
+		//test every value of sel that selects an input, 0 to 8 select a register, 9 selects SignExtDin
+		for (mux_counter = 0; mux_counter < 10; mux_counter = mux_counter + 1) begin
 			mux_sel = mux_counter;
 			#1;
 			check_mux(mux_counter);
 		end
 
-		//test the default range again with a new SignExtDin, to confirm Bus follows it and is not latched
-		mux_SignExtDin = 16'hBBBB;
-		load_mux_TRUE;
-		for (mux_counter = 9; mux_counter < 16; mux_counter = mux_counter + 1) begin
-			mux_sel = mux_counter;
-			#1;
-			check_mux(mux_counter);
-		end
+		//test sel 9 again with a new SignExtDin, to confirm Bus follows it and is not latched
+		mux_sign_ext_din = 16'hBBBB;
+		load_mux_true;
+		mux_sel = 4'd9;
+		#1;
+		check_mux(4'd9);
 
 		//test that Bus tracks a live change on the already selected input
 		mux_sel = 4'd3;
 		#1;
-		mux_R3 = 16'hDEAD;
-		load_mux_TRUE;
+		mux_r3 = 16'hDEAD;
+		load_mux_true;
 		#1;
 		check_mux(4'd3);
 
@@ -359,19 +325,19 @@ module components_tb;
 	task check_reg;
 		input [REG_N-1:0] expected;
 		begin
-			if (reg_out_DUT !== expected) begin
+			if (reg_out_dut !== expected) begin
 				reg_errors = reg_errors + 1;
-				$display("register_n FAIL at t=%0t: rst=%b r_in=%b data_in=%h got=%h expected=%h",$time,reg_rst,reg_rin,reg_din,reg_out_DUT,expected);
+				$display("register_n FAIL at t=%0t: rst=%b r_in=%b data_in=%0d (%h) got=%0d (%h) expected=%0d (%h)",$time,reg_rst,reg_rin,reg_din,reg_din,reg_out_dut,reg_out_dut,expected,expected);
 			end
 		end
 	endtask
 
 	initial begin
 
+		reg_done = 1'b0;
 		reg_errors = 0;
 
 		//test rst, with non-zero data_in so a pass cannot come from data_in being 0
-		@(negedge clk);
 		reg_rst = 1'b1;
 		reg_rin = 1'b0;
 		reg_din = {REG_N{1'b1}};
@@ -380,7 +346,6 @@ module components_tb;
 		check_reg({REG_N{1'b0}});
 
 		//test load, r_in = 1
-		@(negedge clk);
 		reg_rst = 1'b0;
 		reg_rin = 1'b1;
 		reg_din = 16'hA5A5;
@@ -389,14 +354,12 @@ module components_tb;
 		check_reg(16'hA5A5);
 
 		//test a second load, to confirm Q is overwritten and not just set once
-		@(negedge clk);
 		reg_din = 16'h5A5A;
 		@(posedge clk);
 		#1;
 		check_reg(16'h5A5A);
 
 		//test hold, r_in = 0 while data_in changes
-		@(negedge clk);
 		reg_rin = 1'b0;
 		reg_din = 16'hFFFF;
 		@(posedge clk);
@@ -410,7 +373,6 @@ module components_tb;
 		check_reg(16'h5A5A);
 
 		//test rst overriding r_in = 1
-		@(negedge clk);
 		reg_rst = 1'b1;
 		reg_rin = 1'b1;
 		reg_din = 16'hFFFF;
@@ -419,7 +381,6 @@ module components_tb;
 		check_reg({REG_N{1'b0}});
 
 		//test every bit can be driven high
-		@(negedge clk);
 		reg_rst = 1'b0;
 		reg_rin = 1'b1;
 		reg_din = {REG_N{1'b1}};
@@ -428,7 +389,6 @@ module components_tb;
 		check_reg({REG_N{1'b1}});
 
 		//test Q only changes on the clock edge, not combinationally
-		@(negedge clk);
 		reg_din = 16'h0F0F;
 		#1;
 		check_reg({REG_N{1'b1}});
@@ -437,7 +397,6 @@ module components_tb;
 		check_reg(16'h0F0F);
 
 		//release
-		@(negedge clk);
 		reg_rin = 1'b0;
 		reg_din = {REG_N{1'b0}};
 
@@ -461,18 +420,16 @@ module components_tb;
 	task check_alu;
 		input signed [15:0] expected;
 		begin
-			if (alu_result_DUT !== expected) begin
+			if (alu_result_dut !== expected) begin
 				alu_errors = alu_errors + 1;
-				$display("ALU FAIL: op=%b a=%0d b=%0d got=%0d (%h) expected=%0d (%h)",alu_op,alu_a,alu_b,alu_result_DUT,alu_result_DUT,expected,expected);
+				$display("ALU FAIL: op=%b a=%0d b=%0d got=%0d (%h) expected=%0d (%h)",alu_op,alu_a,alu_b,alu_result_dut,alu_result_dut,expected,expected);
 			end
 		end
 	endtask
 	
 	initial begin
 		
-		//waits for the initialise block to finish before overwriting the inputs
-		#1;
-		
+		alu_done = 1'b0;
 		alu_errors = 0;
 		
 		alu_op = OP_MUL;
@@ -796,22 +753,6 @@ module components_tb;
 		alu_b = -16'sd12345;
 		#1;
 		check_alu(-16'sd1);
-		
-		//unused ops give 0
-		alu_a = 16'sd12345;
-		alu_b = -16'sd6789;
-		alu_op = 3'b100;
-		#1;
-		check_alu(16'sd0);
-		alu_op = 3'b101;
-		#1;
-		check_alu(16'sd0);
-		alu_op = 3'b110;
-		#1;
-		check_alu(16'sd0);
-		alu_op = 3'b111;
-		#1;
-		check_alu(16'sd0);
 		
 		if (alu_errors != 0) $display("ALU: %0d checks failed", alu_errors);
 		

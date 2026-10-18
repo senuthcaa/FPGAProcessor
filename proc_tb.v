@@ -27,40 +27,43 @@ module proc_tb;
 		BUS_WRITE_TWO = 4'b1000;
 
 	//dut signals
-	reg clk = 1'b0;
+	reg clk;
 	reg rst;
 	reg enable;
 	reg [8:0] din;
 
 	wire [15:0] bus;
-	wire [3:0] tick_FSM;
-	wire [15:0] R0;
-	wire [15:0] R1;
-	wire [15:0] R2;
-	wire [15:0] R3;
-	wire [15:0] R4;
-	wire [15:0] R5;
-	wire [15:0] R6;
-	wire [15:0] R7;
+	wire [3:0] tick_fsm;
+	wire [15:0] r0;
+	wire [15:0] r1;
+	wire [15:0] r2;
+	wire [15:0] r3;
+	wire [15:0] r4;
+	wire [15:0] r5;
+	wire [15:0] r6;
+	wire [15:0] r7;
 
-	simple_proc proc_DUT (
+	simple_proc proc_dut (
 		.clk(clk),
 		.rst(rst),
 		.enable(enable),
 		.din(din),
 		.bus(bus),
-		.tick_FSM(tick_FSM),
-		.R0(R0),
-		.R1(R1),
-		.R2(R2),
-		.R3(R3),
-		.R4(R4),
-		.R5(R5),
-		.R6(R6),
-		.R7(R7)
+		.tick_FSM(tick_fsm),
+		.R0(r0),
+		.R1(r1),
+		.R2(r2),
+		.R3(r3),
+		.R4(r4),
+		.R5(r5),
+		.R6(r6),
+		.R7(r7)
 	);
 
-	always #(CLK_PERIOD / 2) clk = ~clk;
+	initial begin
+		clk = 1'b0;
+		forever #(CLK_PERIOD / 2) clk = ~clk;
+	end
 
 	//everything below is simulation only, quartus skips it and modelsim still runs it
 	// synthesis translate_off
@@ -98,14 +101,14 @@ module proc_tb;
 		input [2:0] idx;
 		begin
 			case (idx)
-				3'd0 : dut_reg = R0;
-				3'd1 : dut_reg = R1;
-				3'd2 : dut_reg = R2;
-				3'd3 : dut_reg = R3;
-				3'd4 : dut_reg = R4;
-				3'd5 : dut_reg = R5;
-				3'd6 : dut_reg = R6;
-				default : dut_reg = R7;
+				3'd0 : dut_reg = r0;
+				3'd1 : dut_reg = r1;
+				3'd2 : dut_reg = r2;
+				3'd3 : dut_reg = r3;
+				3'd4 : dut_reg = r4;
+				3'd5 : dut_reg = r5;
+				3'd6 : dut_reg = r6;
+				default : dut_reg = r7;
 			endcase
 		end
 	endfunction
@@ -206,10 +209,10 @@ module proc_tb;
 	task check_tick;
 		input [3:0] expd;
 		begin
-			if (tick_FSM === expd) record(1'b1);
+			if (tick_fsm === expd) record(1'b1);
 			else begin
 				record(1'b0);
-				$display("  [FAIL] t=%0d ns | tick_FSM | expected 4'b%b, got 4'b%b", $time, expd, tick_FSM);
+				$display("  [FAIL] t=%0d ns | tick_FSM | expected 4'b%b, got 4'b%b", $time, expd, tick_fsm);
 				print_ctx;
 			end
 		end
@@ -500,9 +503,9 @@ module proc_tb;
 		#1;
 		for (i = 0; i < 12; i = i + 1) begin
 			check_tick(tick_of((i % 4) + 1));
-			if ((^tick_FSM === 1'bx) || (tick_FSM & (tick_FSM - 4'd1)) != 4'd0 || tick_FSM == 4'd0) begin
+			if ((^tick_fsm === 1'bx) || (tick_fsm & (tick_fsm - 4'd1)) != 4'd0 || tick_fsm == 4'd0) begin
 				record(1'b0);
-				$display("  [FAIL] t=%0d ns | tick_FSM is not one-hot: 4'b%b", $time, tick_FSM);
+				$display("  [FAIL] t=%0d ns | tick_FSM is not one-hot: 4'b%b", $time, tick_fsm);
 			end
 			else record(1'b1);
 			tick_edge;
@@ -514,17 +517,17 @@ module proc_tb;
 		seed_regs;
 		verbose = 1'b1;
 		exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);     //5 + -9 = -4
-		check_value("add: R0 = -4 (0xFFFC)", R0, 16'hFFFC);
+		check_value("add: R0 = -4 (0xFFFC)", r0, 16'hFFFC);
 		exec_type1(INSTR_ADD, 3'd2, 3'd3, 1'b1);     //100 + -100 = 0
-		check_value("add: R2 = 0", R2, 16'd0);
+		check_value("add: R2 = 0", r2, 16'd0);
 		exec_type1(INSTR_ADD, 3'd4, 3'd6, 1'b1);     //255 + 77 = 332
-		check_value("add: R4 = 332", R4, 16'd332);
+		check_value("add: R4 = 332", r4, 16'd332);
 		exec_type1(INSTR_ADD, 3'd5, 3'd5, 1'b1);     //-256 + -256 = -512 (Rx = Ry)
-		check_value("add: R5 = -512 (0xFE00)", R5, 16'hFE00);
+		check_value("add: R5 = -512 (0xFE00)", r5, 16'hFE00);
 		exec_type1(INSTR_ADD, 3'd7, 3'd7, 1'b1);     //33 + 33 = 66 (Rx = Ry)
-		check_value("add: R7 = 66", R7, 16'd66);
+		check_value("add: R7 = 66", r7, 16'd66);
 		exec_type1(INSTR_ADD, 3'd7, 3'd0, 1'b1);     //66 + -4 = 62
-		check_value("add: R7 = 62", R7, 16'd62);
+		check_value("add: R7 = 62", r7, 16'd62);
 		verbose = 1'b0;
 		end_section;
 
@@ -533,19 +536,19 @@ module proc_tb;
 		seed_regs;
 		verbose = 1'b1;
 		exec_type2(INSTR_ADDI, 3'd0, 9'h000, 1'b1);     //5 + 0 = 5
-		check_value("addi: R0 = 5", R0, 16'd5);
+		check_value("addi: R0 = 5", r0, 16'd5);
 		exec_type2(INSTR_ADDI, 3'd1, 9'h009, 1'b1);     //-9 + 9 = 0
-		check_value("addi: R1 = 0", R1, 16'd0);
+		check_value("addi: R1 = 0", r1, 16'd0);
 		exec_type2(INSTR_ADDI, 3'd2, 9'h0FF, 1'b1);     //100 + 255 = 355
-		check_value("addi: R2 = 355", R2, 16'd355);
+		check_value("addi: R2 = 355", r2, 16'd355);
 		exec_type2(INSTR_ADDI, 3'd3, 9'h100, 1'b1);     //-100 + -256 = -356
-		check_value("addi: R3 = -356 (0xFE9C)", R3, 16'hFE9C);
+		check_value("addi: R3 = -356 (0xFE9C)", r3, 16'hFE9C);
 		exec_type2(INSTR_ADDI, 3'd4, 9'h1FF, 1'b1);     //255 + -1 = 254
-		check_value("addi: R4 = 254", R4, 16'd254);
+		check_value("addi: R4 = 254", r4, 16'd254);
 		exec_type2(INSTR_ADDI, 3'd5, 9'h0FF, 1'b1);     //-256 + 255 = -1
-		check_value("addi: R5 = -1 (0xFFFF)", R5, 16'hFFFF);
+		check_value("addi: R5 = -1 (0xFFFF)", r5, 16'hFFFF);
 		exec_type2(INSTR_ADDI, 3'd7, 9'h1DF, 1'b1);     //33 + -33 = 0
-		check_value("addi: R7 = 0", R7, 16'd0);
+		check_value("addi: R7 = 0", r7, 16'd0);
 		verbose = 1'b0;
 		end_section;
 
@@ -554,17 +557,17 @@ module proc_tb;
 		seed_regs;
 		verbose = 1'b1;
 		exec_type1(INSTR_SUB, 3'd0, 3'd1, 1'b1);     //5 - -9 = 14
-		check_value("sub: R0 = 14", R0, 16'd14);
+		check_value("sub: R0 = 14", r0, 16'd14);
 		exec_type1(INSTR_SUB, 3'd2, 3'd3, 1'b1);     //100 - -100 = 200
-		check_value("sub: R2 = 200", R2, 16'd200);
+		check_value("sub: R2 = 200", r2, 16'd200);
 		exec_type1(INSTR_SUB, 3'd4, 3'd4, 1'b1);     //255 - 255 = 0 (Rx = Ry)
-		check_value("sub: R4 = 0", R4, 16'd0);
+		check_value("sub: R4 = 0", r4, 16'd0);
 		exec_type1(INSTR_SUB, 3'd5, 3'd6, 1'b1);     //-256 - 77 = -333
-		check_value("sub: R5 = -333 (0xFEB3)", R5, 16'hFEB3);
+		check_value("sub: R5 = -333 (0xFEB3)", r5, 16'hFEB3);
 		exec_type1(INSTR_SUB, 3'd7, 3'd0, 1'b1);     //33 - 14 = 19
-		check_value("sub: R7 = 19", R7, 16'd19);
+		check_value("sub: R7 = 19", r7, 16'd19);
 		exec_type1(INSTR_SUB, 3'd1, 3'd7, 1'b1);     //-9 - 19 = -28 (operand order matters)
-		check_value("sub: R1 = -28 (0xFFE4)", R1, 16'hFFE4);
+		check_value("sub: R1 = -28 (0xFFE4)", r1, 16'hFFE4);
 		verbose = 1'b0;
 		end_section;
 
@@ -573,26 +576,26 @@ module proc_tb;
 		verbose = 1'b1;
 		exec_type2(INSTR_MOVI, 3'd0, 9'h0FF, 1'b1);     //255
 		for (i = 0; i < 7; i = i + 1) exec_type1(INSTR_ADD, 3'd0, 3'd0, 1'b1);     //255 * 128 = 32640
-		check_value("wrap: R0 = 32640 (0x7F80)", R0, 16'h7F80);
+		check_value("wrap: R0 = 32640 (0x7F80)", r0, 16'h7F80);
 		exec_type2(INSTR_ADDI, 3'd0, 9'h07F, 1'b1);     //+127 = 32767
-		check_value("wrap: R0 = 32767 (0x7FFF)", R0, 16'h7FFF);
+		check_value("wrap: R0 = 32767 (0x7FFF)", r0, 16'h7FFF);
 		exec_type2(INSTR_MOVI, 3'd1, 9'h001, 1'b1);
 		exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);        //32767 + 1 wraps to -32768
-		check_value("wrap: add 32767 + 1 = 0x8000", R0, 16'h8000);
+		check_value("wrap: add 32767 + 1 = 0x8000", r0, 16'h8000);
 		exec_type2(INSTR_ADDI, 3'd0, 9'h1FF, 1'b1);     //-32768 + -1 wraps to 32767
-		check_value("wrap: addi 0x8000 + -1 = 0x7FFF", R0, 16'h7FFF);
+		check_value("wrap: addi 0x8000 + -1 = 0x7FFF", r0, 16'h7FFF);
 		exec_type2(INSTR_ADDI, 3'd0, 9'h0FF, 1'b1);     //32767 + 255 wraps to -32514
-		check_value("wrap: addi 0x7FFF + 255 = 0x80FE", R0, 16'h80FE);
+		check_value("wrap: addi 0x7FFF + 255 = 0x80FE", r0, 16'h80FE);
 		exec_type2(INSTR_MOVI, 3'd2, 9'h000, 1'b1);
 		exec_type1(INSTR_SUB, 3'd2, 3'd1, 1'b1);        //0 - 1 = -1
-		check_value("wrap: sub 0 - 1 = 0xFFFF", R2, 16'hFFFF);
+		check_value("wrap: sub 0 - 1 = 0xFFFF", r2, 16'hFFFF);
 		exec_type1(INSTR_SUB, 3'd0, 3'd2, 1'b1);        //0x80FE - (-1) = 0x80FF
-		check_value("wrap: sub 0x80FE - -1 = 0x80FF", R0, 16'h80FF);
+		check_value("wrap: sub 0x80FE - -1 = 0x80FF", r0, 16'h80FF);
 		exec_type2(INSTR_MOVI, 3'd3, 9'h100, 1'b1);     //-256
 		exec_type1(INSTR_SUB, 3'd4, 3'd4, 1'b1);        //x - x = 0
 		exec_type1(INSTR_SUB, 3'd4, 3'd1, 1'b1);        //0 - 1 = -1
 		exec_type1(INSTR_ADD, 3'd3, 3'd3, 1'b1);        //-512
-		check_value("wrap: add -256 + -256 = 0xFE00", R3, 16'hFE00);
+		check_value("wrap: add -256 + -256 = 0xFE00", r3, 16'hFE00);
 		verbose = 1'b0;
 		end_section;
 
@@ -600,13 +603,13 @@ module proc_tb;
 		begin_section("din held (no scrambling)");
 		seed_regs;
 		exec_type2(INSTR_MOVI, 3'd1, 9'h12C, 1'b0);     //-212
-		check_value("held: movi R1 = -212 (0xFF2C)", R1, 16'hFF2C);
+		check_value("held: movi R1 = -212 (0xFF2C)", r1, 16'hFF2C);
 		exec_type2(INSTR_ADDI, 3'd2, 9'h02A, 1'b0);     //100 + 42 = 142
-		check_value("held: addi R2 = 142", R2, 16'd142);
+		check_value("held: addi R2 = 142", r2, 16'd142);
 		exec_type1(INSTR_ADD, 3'd3, 3'd4, 1'b0);        //-100 + 255 = 155
-		check_value("held: add R3 = 155", R3, 16'd155);
+		check_value("held: add R3 = 155", r3, 16'd155);
 		exec_type1(INSTR_SUB, 3'd5, 3'd6, 1'b0);        //-256 - 77 = -333
-		check_value("held: sub R5 = -333 (0xFEB3)", R5, 16'hFEB3);
+		check_value("held: sub R5 = -333 (0xFEB3)", r5, 16'hFEB3);
 		end_section;
 
 		//SECTION 8: enable GATING, PAUSE IN EVERY TICK OF EVERY INSTRUCTION
@@ -628,11 +631,11 @@ module proc_tb;
 		//the processor must run normally again after a reset
 		exec_type2(INSTR_MOVI, 3'd2, 9'h007, 1'b1);
 		exec_type2(INSTR_ADDI, 3'd2, 9'h003, 1'b1);
-		check_value("post-reset: R2 = 10", R2, 16'd10);
+		check_value("post-reset: R2 = 10", r2, 16'd10);
 		exec_type1(INSTR_ADD, 3'd3, 3'd2, 1'b1);
-		check_value("post-reset: R3 = 10", R3, 16'd10);
+		check_value("post-reset: R3 = 10", r3, 16'd10);
 		exec_type1(INSTR_SUB, 3'd3, 3'd2, 1'b1);
-		check_value("post-reset: R3 = 0", R3, 16'd0);
+		check_value("post-reset: R3 = 0", r3, 16'd0);
 		end_section;
 
 		//SUMMARY
