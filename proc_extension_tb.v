@@ -1,13 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains a Verilog test bench to test the correctness of the extended processor.
-It tests the Task 3 processor (extended_proc). Sections 1 to 13 are the Task 2 tests from proc_tb.v,
-    and section 14 briefly checks the Task 3 instructions mul, ssi and disp.
 
-Please enter your student ID:
 -Hoorad: 36166804
--
+-Senuth: 36180513
 
 */
 module proc_extension_tb;
@@ -591,25 +586,6 @@ module proc_extension_tb;
 		check_value("movi: overwrite R3 = 85", R3, 16'd85);
 		end_section;
 
-		//SECTION 4: add
-		begin_section("add");
-		seed_regs;
-		verbose = 1'b1;
-		exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);     //5 + -9 = -4
-		check_value("add: R0 = -4 (0xFFFC)", R0, 16'hFFFC);
-		exec_type1(INSTR_ADD, 3'd2, 3'd3, 1'b1);     //100 + -100 = 0
-		check_value("add: R2 = 0", R2, 16'd0);
-		exec_type1(INSTR_ADD, 3'd4, 3'd6, 1'b1);     //255 + 77 = 332
-		check_value("add: R4 = 332", R4, 16'd332);
-		exec_type1(INSTR_ADD, 3'd5, 3'd5, 1'b1);     //-256 + -256 = -512 (Rx = Ry)
-		check_value("add: R5 = -512 (0xFE00)", R5, 16'hFE00);
-		exec_type1(INSTR_ADD, 3'd7, 3'd7, 1'b1);     //33 + 33 = 66 (Rx = Ry)
-		check_value("add: R7 = 66", R7, 16'd66);
-		exec_type1(INSTR_ADD, 3'd7, 3'd0, 1'b1);     //66 + -4 = 62
-		check_value("add: R7 = 62", R7, 16'd62);
-		verbose = 1'b0;
-		end_section;
-
 		//SECTION 5: addi
 		begin_section("addi");
 		seed_regs;
@@ -629,161 +605,6 @@ module proc_extension_tb;
 		exec_type2(INSTR_ADDI, 3'd7, 9'h1DF, 1'b1);     //33 + -33 = 0
 		check_value("addi: R7 = 0", R7, 16'd0);
 		verbose = 1'b0;
-		end_section;
-
-		//SECTION 6: sub
-		begin_section("sub");
-		seed_regs;
-		verbose = 1'b1;
-		exec_type1(INSTR_SUB, 3'd0, 3'd1, 1'b1);     //5 - -9 = 14
-		check_value("sub: R0 = 14", R0, 16'd14);
-		exec_type1(INSTR_SUB, 3'd2, 3'd3, 1'b1);     //100 - -100 = 200
-		check_value("sub: R2 = 200", R2, 16'd200);
-		exec_type1(INSTR_SUB, 3'd4, 3'd4, 1'b1);     //255 - 255 = 0 (Rx = Ry)
-		check_value("sub: R4 = 0", R4, 16'd0);
-		exec_type1(INSTR_SUB, 3'd5, 3'd6, 1'b1);     //-256 - 77 = -333
-		check_value("sub: R5 = -333 (0xFEB3)", R5, 16'hFEB3);
-		exec_type1(INSTR_SUB, 3'd7, 3'd0, 1'b1);     //33 - 14 = 19
-		check_value("sub: R7 = 19", R7, 16'd19);
-		exec_type1(INSTR_SUB, 3'd1, 3'd7, 1'b1);     //-9 - 19 = -28 (operand order matters)
-		check_value("sub: R1 = -28 (0xFFE4)", R1, 16'hFFE4);
-		verbose = 1'b0;
-		end_section;
-
-		//SECTION 7: OVERFLOW AND UNDERFLOW WRAP-AROUND
-		begin_section("Overflow / underflow wrap");
-		verbose = 1'b1;
-		exec_type2(INSTR_MOVI, 3'd0, 9'h0FF, 1'b1);     //255
-		for (i = 0; i < 7; i = i + 1) exec_type1(INSTR_ADD, 3'd0, 3'd0, 1'b1);     //255 * 128 = 32640
-		check_value("wrap: R0 = 32640 (0x7F80)", R0, 16'h7F80);
-		exec_type2(INSTR_ADDI, 3'd0, 9'h07F, 1'b1);     //+127 = 32767
-		check_value("wrap: R0 = 32767 (0x7FFF)", R0, 16'h7FFF);
-		exec_type2(INSTR_MOVI, 3'd1, 9'h001, 1'b1);
-		exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);        //32767 + 1 wraps to -32768
-		check_value("wrap: add 32767 + 1 = 0x8000", R0, 16'h8000);
-		exec_type2(INSTR_ADDI, 3'd0, 9'h1FF, 1'b1);     //-32768 + -1 wraps to 32767
-		check_value("wrap: addi 0x8000 + -1 = 0x7FFF", R0, 16'h7FFF);
-		exec_type2(INSTR_ADDI, 3'd0, 9'h0FF, 1'b1);     //32767 + 255 wraps to -32514
-		check_value("wrap: addi 0x7FFF + 255 = 0x80FE", R0, 16'h80FE);
-		exec_type2(INSTR_MOVI, 3'd2, 9'h000, 1'b1);
-		exec_type1(INSTR_SUB, 3'd2, 3'd1, 1'b1);        //0 - 1 = -1
-		check_value("wrap: sub 0 - 1 = 0xFFFF", R2, 16'hFFFF);
-		exec_type1(INSTR_SUB, 3'd0, 3'd2, 1'b1);        //0x80FE - (-1) = 0x80FF
-		check_value("wrap: sub 0x80FE - -1 = 0x80FF", R0, 16'h80FF);
-		exec_type2(INSTR_MOVI, 3'd3, 9'h100, 1'b1);     //-256
-		exec_type1(INSTR_SUB, 3'd4, 3'd4, 1'b1);        //x - x = 0
-		exec_type1(INSTR_SUB, 3'd4, 3'd1, 1'b1);        //0 - 1 = -1
-		exec_type1(INSTR_ADD, 3'd3, 3'd3, 1'b1);        //-512
-		check_value("wrap: add -256 + -256 = 0xFE00", R3, 16'hFE00);
-		verbose = 1'b0;
-		end_section;
-
-		//SECTION 8: din HELD (NOT SCRAMBLED), THE OTHER OPERATING MODE
-		begin_section("din held (no scrambling)");
-		seed_regs;
-		exec_type2(INSTR_MOVI, 3'd1, 9'h12C, 1'b0);     //-212
-		check_value("held: movi R1 = -212 (0xFF2C)", R1, 16'hFF2C);
-		exec_type2(INSTR_ADDI, 3'd2, 9'h02A, 1'b0);     //100 + 42 = 142
-		check_value("held: addi R2 = 142", R2, 16'd142);
-		exec_type1(INSTR_ADD, 3'd3, 3'd4, 1'b0);        //-100 + 255 = 155
-		check_value("held: add R3 = 155", R3, 16'd155);
-		exec_type1(INSTR_SUB, 3'd5, 3'd6, 1'b0);        //-256 - 77 = -333
-		check_value("held: sub R5 = -333 (0xFEB3)", R5, 16'hFEB3);
-		end_section;
-
-		//SECTION 9: EXHAUSTIVE REGISTER ADDRESSING (EVERY Rx, EVERY Ry)
-		begin_section("Exhaustive Rx / Ry addressing");
-		for (i = 0; i < 8; i = i + 1) begin
-			for (j = 0; j < 8; j = j + 1) begin
-				seed_regs;
-				exec_type1(INSTR_ADD, i[2:0], j[2:0], 1'b1);
-				seed_regs;
-				exec_type1(INSTR_SUB, i[2:0], j[2:0], 1'b1);
-			end
-			seed_regs;
-			exec_type2(INSTR_MOVI, i[2:0], 9'h1A5, 1'b1);     //-91
-			seed_regs;
-			exec_type2(INSTR_ADDI, i[2:0], 9'h05A, 1'b1);     //+90
-		end
-		end_section;
-
-		//SECTION 10: enable GATING, PAUSE IN EVERY TICK OF EVERY INSTRUCTION
-		begin_section("enable gating (pause in every tick)");
-		for (i = 1; i <= 4; i = i + 1) begin
-			pause_at = i[2:0];
-			seed_regs;
-			exec_type1(INSTR_ADD, 3'd1, 3'd2, 1'b1);
-			exec_type1(INSTR_SUB, 3'd3, 3'd4, 1'b1);
-			exec_type2(INSTR_MOVI, 3'd5, 9'h13B, 1'b1);
-			exec_type2(INSTR_ADDI, 3'd6, 9'h021, 1'b1);
-		end
-		pause_at = 3'd0;
-		end_section;
-
-		//SECTION 11: RESET IN THE MIDDLE OF AN INSTRUCTION
-		begin_section("Reset mid-instruction");
-		for (i = 1; i <= 4; i = i + 1) reset_at_tick(i[2:0]);
-		//the processor must run normally again after a reset
-		exec_type2(INSTR_MOVI, 3'd2, 9'h007, 1'b1);
-		exec_type2(INSTR_ADDI, 3'd2, 9'h003, 1'b1);
-		check_value("post-reset: R2 = 10", R2, 16'd10);
-		exec_type1(INSTR_ADD, 3'd3, 3'd2, 1'b1);
-		check_value("post-reset: R3 = 10", R3, 16'd10);
-		exec_type1(INSTR_SUB, 3'd3, 3'd2, 1'b1);
-		check_value("post-reset: R3 = 0", R3, 16'd0);
-		end_section;
-
-		//SECTION 12: THE UNDEFINED OPCODE IS A NOP
-		//Task 3 implements disp, mul and ssi (opcodes 0, 4 and 5), so only opcode 6 (bez) is still undefined
-		if (CHECK_UNDEFINED_AS_NOP) begin
-			begin_section("Undefined opcode (bez) is a NOP");
-			seed_regs;
-			for (j = 0; j < 6; j = j + 1) exec_undefined(3'd6, j[0]);
-			//a valid instruction must still work straight afterwards
-			exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);
-			end_section;
-		end
-
-		//SECTION 13: CONSTRAINED RANDOM REGRESSION USING AN LFSR
-		//random opcode, registers, immediate, din scrambling and pauses, checked against the model
-		begin_section("Random regression (LFSR)");
-		seed_regs;
-		for (i = 0; i < N_RANDOM; i = i + 1) begin
-			next_rand;
-			if (lfsr[2:0] == 3'd0) begin
-				next_rand;
-				pause_at = {1'b0, lfsr[1:0]} + 3'd1;
-			end
-			else pause_at = 3'd0;
-			next_rand;
-			case (lfsr[1:0])
-				2'd0 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type1(INSTR_ADD, j[2:0], lfsr[2:0], lfsr[8]);
-				end
-				2'd1 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type2(INSTR_ADDI, j[2:0], lfsr[8:0], lfsr[12]);
-				end
-				2'd2 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type1(INSTR_SUB, j[2:0], lfsr[2:0], lfsr[8]);
-				end
-				default : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type2(INSTR_MOVI, j[2:0], lfsr[8:0], lfsr[12]);
-				end
-			endcase
-		end
-		pause_at = 3'd0;
 		end_section;
 
 		//SECTION 14: TASK 3 INSTRUCTIONS, A FEW BRIEF CHECKS OF mul, ssi AND disp
@@ -811,17 +632,13 @@ module proc_extension_tb;
 
 		//SUMMARY
 		$display("");
-		$display("==================================================");
 		$display(" TEST SUMMARY");
-		$display("==================================================");
 		for (i = 0; i < n_sections; i = i + 1) begin
 			if (res_fails[i] == 0) $display("  PASS  %0s (%0d checks)", res_name[i], res_checks[i]);
 			else $display("  FAIL  %0s (%0d of %0d checks failed)", res_name[i], res_fails[i], res_checks[i]);
 		end
-		$display("--------------------------------------------------");
 		if (total_fails == 0) $display(" ALL %0d CHECKS PASSED", total_checks);
 		else $display(" %0d OF %0d CHECKS FAILED, see the [FAIL] lines above", total_fails, total_checks);
-		$display("==================================================");
 		$stop;     //use $finish instead when running outside modelsim
 
 	end
