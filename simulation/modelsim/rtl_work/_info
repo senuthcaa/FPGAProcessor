@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/simulation/modelsim
 valu
-Z1 !s110 1791950339
+Z1 !s110 1792289395
 !i10b 1
 !s100 ^UHfYOQO>M5HLE8z=[1YB1
 IW2M0h]jF6bXSW6]A8AeFg3
@@ -23,31 +23,31 @@ Z6 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z7 !s108 1791950339.000000
+Z7 !s108 1792289395.000000
 Z8 !s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
 Z9 !s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
 !i113 1
 Z10 o-vlog01compat -work work
 Z11 !s92 -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor
 Z12 tCvgOpt 0
-vextended_proc
+vcomponents_tb
 R1
 !i10b 1
-!s100 faaa5N59Yh>IJ@g;9_aDg3
-I8CEk?GizeeFT?IZMz?kfQ1
+!s100 nZ:FDG><E2B_U>LeIX75Z1
+IT@2LZz]VYczh@k[06?=gi1
 R2
 R0
-w1791945627
-8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v
-FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v
-L0 8
+w1791945626
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v
+L0 7
 R6
 r1
 !s85 0
 31
 R7
-!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v|
-!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v|
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v|
 !i113 1
 R10
 R11
@@ -70,28 +70,6 @@ r1
 R7
 R8
 R9
-!i113 1
-R10
-R11
-R12
-vproc_extension_tb
-!s110 1791950338
-!i10b 1
-!s100 ;ek=iUTGmVO5`jiQD:6OO3
-IJl5D8`zGM254@WW<7jKFN1
-R2
-R0
-w1791948461
-8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v
-FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v
-L0 13
-R6
-r1
-!s85 0
-31
-!s108 1791950338.000000
-!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v|
-!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v|
 !i113 1
 R10
 R11
