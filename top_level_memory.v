@@ -41,7 +41,7 @@ module top_level_memory #(
 		BUS_WRITE_TWO = 4'b1000;
 
 	wire [8:0] din;
-	wire [15:0] PC;
+	wire [15:0] pc;
 
 	wire [15:0] bus;
 	wire [15:0] display;
@@ -79,7 +79,7 @@ module top_level_memory #(
 	//the PC only changes on a 10 Hz edge and the ROM reads it again every 20 ns, so din holds the word at PC
 	// before the next 10 Hz edge
 	instruction_ROM rom_inst (
-		.address(PC),
+		.address(pc),
 		.clock(CLOCK_50),
 		.q(din)
 	);
@@ -103,7 +103,7 @@ module top_level_memory #(
 		.R6(),
 		.R7(),
 
-		.PC(PC)
+		.PC(pc)
 	);
 
 	//display bottom 10 bits of processor bus on LEDs

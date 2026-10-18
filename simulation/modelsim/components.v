@@ -84,7 +84,7 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 			4'd7 : Bus = R7;
 			4'd8 : Bus = G;
 			4'd9 : Bus = SignExtDin;
-			default : Bus = SignExtDin;
+			default : Bus = 16'bx;
 		endcase
 	end
 
@@ -106,15 +106,11 @@ module alu (
 		OP_SUB = 3'b010,
 		OP_SHF = 3'b011;
 
-	//add or subtrract
-   wire do_sub = (alu_op == OP_SUB);
-   wire [15:0] addsub = input_a + (do_sub ? ~input_b : input_b) + do_sub;
-
    //bit-shifting - input b is shifted by the signed amount in input a
    //positive input a shifts input b left (logical), negative input a shifts input b right (arithmetic)
    wire shift_right = input_a[15];
    wire [15:0] shift_distance = shift_right ? -input_a : input_a;
-   wire saturate = |shift_distance[15:4]; //saturate is the boolean: true if shift_distance >= 16
+   wire saturate = (shift_distance >= 16'd16); //saturate is the boolean: true if shift_distance >= 16
 	wire [3:0] true_shift_distance = shift_distance[3:0];
 
 	wire signed [15:0] shift_right_arithmetic = input_b >>> true_shift_distance;
@@ -127,9 +123,10 @@ module alu (
    always @(*) begin
       case (alu_op)
 			OP_MUL : result = input_a * input_b;
-         OP_ADD, OP_SUB : result = addsub;
+         OP_ADD : result = input_a + input_b;
+         OP_SUB : result = input_a - input_b;
          OP_SHF : result = shifted;
-			default : result = 16'd0;
+			default : result = 16'bx;
 		endcase
    end
 

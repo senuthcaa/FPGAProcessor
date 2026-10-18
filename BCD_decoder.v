@@ -20,7 +20,7 @@ module signed_bcd (
 	assign negative = value[15];
 
 	//-32768 negates to itself, which reads as 32768 unsigned, so the magnitude is correct for every input
-	assign magnitude = negative ? (~value + 16'd1) : value;
+	assign magnitude = negative ? -value : value;
 
 	always @(*) begin
 		bcd = 20'd0;
@@ -58,7 +58,7 @@ module hex_digit (
 			4'd7 : hex[6:0] = 7'b1111000;
 			4'd8 : hex[6:0] = 7'b0000000;
 			4'd9 : hex[6:0] = 7'b0010000;
-			default : hex[6:0] = 7'b1111111;
+			default : hex[6:0] = 7'bx;
 		endcase
 	end
 
