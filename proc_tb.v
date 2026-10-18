@@ -11,8 +11,6 @@ module proc_tb;
 
 	//configuration
 	localparam CLK_PERIOD = 10;               //ns
-	localparam N_RANDOM = 500;                //number of random instructions in section 13
-	localparam CHECK_UNDEFINED_AS_NOP = 1;    //1 for Task 2 processor, 0 for later tasks
 
 	//instruction opcodes from the x72 instruction table
 	localparam
@@ -65,6 +63,8 @@ module proc_tb;
 	always #(CLK_PERIOD / 2) clk = ~clk;
 
 	//everything below is simulation only, quartus skips it and modelsim still runs it
+	// synthesis translate_off
+
 	//reference model and bookkeeping
 	reg [15:0] exp_r [0:7];        //expected register contents
 	reg [15:0] lfsr;               //16-bit LFSR, x^16 + x^14 + x^13 + x^11 + 1
@@ -91,7 +91,6 @@ module proc_tb;
 	reg cur_has_imm;
 
 	integer i;
-	integer j;
 
 	//helper functions
 
@@ -430,29 +429,6 @@ module proc_tb;
 		end
 	endtask
 
-	//an opcode the Task 2 processor does not implement: must not change any register
-	task exec_undefined;
-		input [2:0] op;
-		input scramble;
-		reg [3:0] k;
-		begin
-			next_rand;
-			din = {op, lfsr[5:0]};
-			cur_mnem = "undef";
-			cur_rx = din[5:3];
-			cur_ry = din[2:0];
-			cur_has_imm = 1'b0;
-			#1;
-			for (k = 4'd1; k <= 4'd4; k = k + 4'd1) begin
-				check_tick(tick_of(k[2:0]));
-				check_regs("undefined opcode: regs unchanged");
-				tick_edge;
-				maybe_scramble(scramble);
-			end
-			check_tick(DIN_READ);
-		end
-	endtask
-
 	//load all 8 registers with known, distinct values: 5, -9, 100, -100, 255, -256, 77, 33
 	task seed_regs;
 		reg [3:0] sr;
@@ -506,7 +482,7 @@ module proc_tb;
 		din = 9'd0;
 
 		$display(" ECE2072 simple_proc testbench (Task 2)");
-		$display(" clock period = %0d ns, random instructions = %0d", CLK_PERIOD, N_RANDOM);
+		$display(" clock period = %0d ns", CLK_PERIOD);
 
 		//SECTION 1: RESET
 		begin_section("Reset");
@@ -533,7 +509,7 @@ module proc_tb;
 		end
 		end_section;
 
-		//SECTION 4: add
+		//SECTION 3: add
 		begin_section("add");
 		seed_regs;
 		verbose = 1'b1;
@@ -552,7 +528,7 @@ module proc_tb;
 		verbose = 1'b0;
 		end_section;
 
-		//SECTION 5: addi
+		//SECTION 4: addi
 		begin_section("addi");
 		seed_regs;
 		verbose = 1'b1;
@@ -573,7 +549,7 @@ module proc_tb;
 		verbose = 1'b0;
 		end_section;
 
-		//SECTION 6: sub
+		//SECTION 5: sub
 		begin_section("sub");
 		seed_regs;
 		verbose = 1'b1;
@@ -592,7 +568,7 @@ module proc_tb;
 		verbose = 1'b0;
 		end_section;
 
-		//SECTION 7: OVERFLOW AND UNDERFLOW WRAP-AROUND
+		//SECTION 6: OVERFLOW AND UNDERFLOW WRAP-AROUND
 		begin_section("Overflow / underflow wrap");
 		verbose = 1'b1;
 		exec_type2(INSTR_MOVI, 3'd0, 9'h0FF, 1'b1);     //255
@@ -620,7 +596,7 @@ module proc_tb;
 		verbose = 1'b0;
 		end_section;
 
-		//SECTION 8: din HELD (NOT SCRAMBLED), THE OTHER OPERATING MODE
+		//SECTION 7: din HELD (NOT SCRAMBLED), THE OTHER OPERATING MODE
 		begin_section("din held (no scrambling)");
 		seed_regs;
 		exec_type2(INSTR_MOVI, 3'd1, 9'h12C, 1'b0);     //-212
@@ -633,8 +609,7 @@ module proc_tb;
 		check_value("held: sub R5 = -333 (0xFEB3)", R5, 16'hFEB3);
 		end_section;
 
-
-		//SECTION 10: enable GATING, PAUSE IN EVERY TICK OF EVERY INSTRUCTION
+		//SECTION 8: enable GATING, PAUSE IN EVERY TICK OF EVERY INSTRUCTION
 		begin_section("enable gating (pause in every tick)");
 		for (i = 1; i <= 4; i = i + 1) begin
 			pause_at = i[2:0];
@@ -647,7 +622,7 @@ module proc_tb;
 		pause_at = 3'd0;
 		end_section;
 
-		//SECTION 11: RESET IN THE MIDDLE OF AN INSTRUCTION
+		//SECTION 9: RESET IN THE MIDDLE OF AN INSTRUCTION
 		begin_section("Reset mid-instruction");
 		for (i = 1; i <= 4; i = i + 1) reset_at_tick(i[2:0]);
 		//the processor must run normally again after a reset
@@ -659,9 +634,6 @@ module proc_tb;
 		exec_type1(INSTR_SUB, 3'd3, 3'd2, 1'b1);
 		check_value("post-reset: R3 = 0", R3, 16'd0);
 		end_section;
-
-		
-		pause_at = 3'd0;
 
 		//SUMMARY
 		$display("");
