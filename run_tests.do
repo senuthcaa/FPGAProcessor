@@ -23,24 +23,24 @@ quietly set rt_tests {
 	{4 proc_extension_tb broken_proc_extension.v {components.v broken_proc_extension.v proc_extension_tb.v}      fail}
 }
 
-#components_tb counts the failures of each component in these integers
-quietly set rt_components {
-	{"sign extender" se_errors}
-	{"tick FSM" tick_errors}
-	{"mux" mux_errors}
-	{"alu" alu_errors}
-	{"register_n" reg_errors}
-}
-
-proc rt_rule {ch} {
-	echo [string repeat $ch 86]
-}
-
-proc rt_banner {text} {
-	echo ""
-	rt_rule =
-	echo " $text"
-	rt_rule =
+#each testbench counts the failures of each of its tests in these integers, the same ones its TEST SUMMARY prints
+quietly set rt_counters {
+	components_tb {
+		{"sign extender" se_errors}
+		{"tick FSM" tick_errors}
+		{"mux" mux_errors}
+		{"alu" alu_errors}
+		{"register_n" reg_errors}
+	}
+	proc_extension_tb {
+		{"reset" reset_errors}
+		{"tick FSM" tick_errors}
+		{"movi" movi_errors}
+		{"addi" addi_errors}
+		{"mul" mul_errors}
+		{"ssi" ssi_errors}
+		{"disp" disp_errors}
+	}
 }
 
 #the project folder is the one with ECE2072Project.qpf and the broken files in it
@@ -99,9 +99,10 @@ proc rt_int {path} {
 
 #run one test, returns {failures detail}, with failures = -1 if the test could not run
 proc rt_run {num tb design files expect} {
-	global rt_components
+	global rt_counters
 	if {$expect eq "pass"} { set want "should PASS" } else { set want "should FAIL, showing the testbench catches the bugs" }
-	rt_banner "TEST $num: $tb on $design ($want)"
+	echo ""
+	echo "==TEST $num: $tb on $design ($want)=="
 
 	if {![rt_compile $files]} { return [list -1 "compile error"] }
 	if {[catch {vsim -quiet -voptargs=+acc rt_work.$tb}]} { return [list -1 "could not load $tb"] }
@@ -110,43 +111,21 @@ proc rt_run {num tb design files expect} {
 		return [list -1 "the simulation did not run"]
 	}
 
-	if {$tb eq "components_tb"} {
-		set fails 0
-		set parts {}
-		foreach c $rt_components {
-			set n [rt_int /components_tb/[lindex $c 1]]
-			if {$n < 0} { set fails -1; break }
-			incr fails $n
-			if {$n > 0} { lappend parts "[lindex $c 0] $n" }
-		}
-		if {$fails < 0} {
-			set detail "results could not be read"
-		} elseif {$fails == 0} {
-			set detail "0 failures in any component"
-		} else {
-			set detail "$fails failures: [join $parts {, }]"
-		}
+	#add up the failure counters, and list the tests that failed
+	set fails 0
+	set parts {}
+	foreach c [dict get $rt_counters $tb] {
+		set n [rt_int /$tb/[lindex $c 1]]
+		if {$n < 0} { set fails -1; break }
+		incr fails $n
+		if {$n > 0} { lappend parts "[lindex $c 0] $n" }
+	}
+	if {$fails < 0} {
+		set detail "results could not be read"
+	} elseif {$fails == 0} {
+		set detail "0 checks failed"
 	} else {
-		set checks [rt_int /$tb/total_checks]
-		set fails [rt_int /$tb/total_fails]
-		set nsec [rt_int /$tb/n_sections]
-		set bad {}
-		for {set i 0} {$i < $nsec} {incr i} {
-			if {[rt_int "/$tb/res_fails\[$i\]"] > 0} { lappend bad [expr {$i + 1}] }
-		}
-		if {$fails < 0 || $checks < 0} {
-			set fails -1
-			set detail "results could not be read"
-		} elseif {$fails == 0} {
-			set detail "all $checks checks passed"
-		} else {
-			if {[llength $bad] == 1} {
-				set detail "$fails of $checks checks failed, all in section [lindex $bad 0]"
-			} else {
-				set detail "$fails of $checks checks failed, in sections [join $bad {, }]"
-			}
-			if {[lindex $bad end] == $nsec} { append detail " (section $nsec is mul, ssi and disp)" }
-		}
+		set detail "$fails checks failed: [join $parts {, }]"
 	}
 	catch {quit -sim}
 	return [list $fails $detail]
@@ -171,9 +150,9 @@ proc rt_main {} {
 		if {[catch {vdel -lib rt_work -all}]} { catch {file delete -force rt_work} }
 	}
 
-	rt_banner "SUMMARY"
-	echo [format " %-5s %-18s %-24s %-9s %-7s %s" "Test" "Testbench" "Design" "Expected" "Result" "Details"]
-	rt_rule -
+	echo ""
+	echo "==RUN_TESTS SUMMARY=="
+	echo [format "%-5s %-18s %-24s %-9s %-7s %s" "Test" "Testbench" "Design" "Expected" "Result" "Details"]
 	array set works {}
 	foreach r $results {
 		lassign $r num tb design expect fails detail
@@ -187,17 +166,16 @@ proc rt_main {} {
 		set ok [expr {($expect eq "pass" && $result eq "PASS") || ($expect eq "fail" && $result eq "FAIL")}]
 		if {![info exists works($tb)]} { set works($tb) 1 }
 		if {!$ok} { set works($tb) 0 }
-		echo [format " %-5s %-18s %-24s %-9s %-7s %s" $num $tb $design [string toupper $expect] $result $detail]
+		echo [format "%-5s %-18s %-24s %-9s %-7s %s" $num $tb $design [string toupper $expect] $result $detail]
 	}
-	rt_rule -
+	echo ""
 	foreach tb {components_tb proc_extension_tb} {
 		if {$works($tb)} {
-			echo [format " %-18s WORKS: passes the working design and catches the bugs in the broken one" $tb]
+			echo [format "%-18s WORKS: passes the working design and catches the bugs in the broken one" $tb]
 		} else {
-			echo [format " %-18s DID NOT behave as expected, see the tests above" $tb]
+			echo [format "%-18s DID NOT behave as expected, see the tests above" $tb]
 		}
 	}
-	rt_rule =
 }
 
 quietly rt_main
