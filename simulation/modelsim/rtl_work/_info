@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/simulation/modelsim
 valu
-Z1 !s110 1792289395
+Z1 !s110 1792293179
 !i10b 1
 !s100 ^UHfYOQO>M5HLE8z=[1YB1
 IW2M0h]jF6bXSW6]A8AeFg3
@@ -23,31 +23,98 @@ Z6 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z7 !s108 1792289395.000000
+Z7 !s108 1792293179.000000
 Z8 !s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
 Z9 !s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v|
 !i113 1
 Z10 o-vlog01compat -work work
 Z11 !s92 -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor
 Z12 tCvgOpt 0
-vcomponents_tb
+vdisplay_decoder
 R1
 !i10b 1
-!s100 nZ:FDG><E2B_U>LeIX75Z1
-IT@2LZz]VYczh@k[06?=gi1
+!s100 3;^BRf0@1W6BInMzbz^ZC2
+I[Z;70_ek[EO0HmiI?_bhO0
 R2
 R0
-w1791945626
-8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v
-FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v
-L0 7
+Z13 w1791945629
+Z14 8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v
+Z15 FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v
+L0 70
 R6
 r1
 !s85 0
 31
 R7
-!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v|
-!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v|
+Z16 !s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v|
+Z17 !s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v|
+!i113 1
+R10
+R11
+R12
+vhex_digit
+R1
+!i10b 1
+!s100 S[mM^4W:BeM_lFz]DEX3A0
+Io_dVioQUc@Czz^`f13gli3
+R2
+R0
+R13
+R14
+R15
+L0 42
+R6
+r1
+!s85 0
+31
+R7
+R16
+R17
+!i113 1
+R10
+R11
+R12
+vinstruction_ROM
+R1
+!i10b 1
+!s100 g];:L?F?z7RCAah9aWSDe1
+I`n2C@H?S;RE:AoPYT2Yl92
+R2
+R0
+w1791938760
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v
+L0 39
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v|
+!i113 1
+R10
+R11
+R12
+ninstruction_@r@o@m
+vmemory_proc
+R1
+!i10b 1
+!s100 =:a8[ATH<]M@mkVClll^F0
+IE[11W6@=j1<HFK<AjTA9f1
+R2
+R0
+w1791945628
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v
+L0 8
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v|
 !i113 1
 R10
 R11
@@ -118,6 +185,28 @@ R9
 R10
 R11
 R12
+vsigned_bcd
+R1
+!i10b 1
+!s100 1k<Za[>3:ndO;oRlc3H?K1
+Ic3FCn0FX78mQ2m0lR2LI:2
+R2
+R0
+R13
+R14
+R15
+L0 10
+R6
+r1
+!s85 0
+31
+R7
+R16
+R17
+!i113 1
+R10
+R11
+R12
 vtick_FSM
 R1
 !i10b 1
@@ -141,3 +230,25 @@ R10
 R11
 R12
 ntick_@f@s@m
+vtop_level_memory
+R1
+!i10b 1
+!s100 CE=KnV^_C^E[D0K7V9YAS3
+Ib1D5Ne@3_83B9CEK3iOF@0
+R2
+R0
+w1792288772
+8C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v
+FC:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v
+L0 8
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor|C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v|
+!i113 1
+R10
+R11
+R12

@@ -7,7 +7,7 @@
 module components_tb;
 
 	//parameters
-	localparam REG_N = 16;              // width of register_n under test (change to test other N)
+	localparam REG_N = 16; // width of register_n under test (change to test other N)
 
 	//clock
 	reg clk = 1'b0;

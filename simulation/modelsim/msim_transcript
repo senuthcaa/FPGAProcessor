@@ -10,19 +10,9 @@
 # Copying C:/intelFPGA_lite/18.1/modelsim_ae/win32aloem/../modelsim.ini to modelsim.ini
 # Modifying modelsim.ini
 # 
-# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v}
-# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 13:09:55 on Oct 18,2026
-# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v 
-# -- Compiling module components_tb
-# 
-# Top level modules:
-# 	components_tb
-# End time: 13:09:55 on Oct 18,2026, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 0
 # vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v}
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 13:09:55 on Oct 18,2026
+# Start time: 14:12:59 on Oct 18,2026
 # vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v 
 # -- Compiling module sign_extend
 # -- Compiling module tick_FSM
@@ -36,18 +26,58 @@
 # 	multiplexer
 # 	alu
 # 	register_n
-# End time: 13:09:55 on Oct 18,2026, Elapsed time: 0:00:00
+# End time: 14:12:59 on Oct 18,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:12:59 on Oct 18,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/BCD_decoder.v 
+# -- Compiling module signed_bcd
+# -- Compiling module hex_digit
+# -- Compiling module display_decoder
+# 
+# Top level modules:
+# 	display_decoder
+# End time: 14:12:59 on Oct 18,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:12:59 on Oct 18,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_memory.v 
+# -- Compiling module memory_proc
+# 
+# Top level modules:
+# 	memory_proc
+# End time: 14:12:59 on Oct 18,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:12:59 on Oct 18,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/top_level_memory.v 
+# -- Compiling module top_level_memory
+# 
+# Top level modules:
+# 	top_level_memory
+# End time: 14:12:59 on Oct 18,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 14:12:59 on Oct 18,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/instruction_ROM.v 
+# -- Compiling module instruction_ROM
+# 
+# Top level modules:
+# 	instruction_ROM
+# End time: 14:12:59 on Oct 18,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # 
 do run_tests.do
 # reading C:/intelFPGA_lite/18.1/modelsim_ae/win32aloem/../modelsim.ini
 # run_tests.do: running in C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor
 # 
-# ======================================================================================
-#  TEST 1: components_tb on components.v (should PASS)
-# ======================================================================================
+# ==TEST 1: components_tb on components.v (should PASS)==
 # vsim -quiet -voptargs="+acc" rt_work.components_tb 
-# Start time: 13:10:31 on Oct 18,2026
+# Start time: 14:13:17 on Oct 18,2026
 # //  ModelSim - Intel FPGA Edition 10.5b Oct  5 2016
 # //
 # //  Copyright 1991-2016 Mentor Graphics Corporation
@@ -70,14 +100,12 @@ do run_tests.do
 # ** Note: $stop    : components_tb.v(836)
 #    Time: 512 ns  Iteration: 1  Instance: /components_tb
 # Break in Module components_tb at components_tb.v line 836
-# End time: 13:11:17 on Oct 18,2026, Elapsed time: 0:00:46
+# End time: 14:14:02 on Oct 18,2026, Elapsed time: 0:00:45
 # Errors: 0, Warnings: 0
 # 
-# ======================================================================================
-#  TEST 2: components_tb on broken_components.v (should FAIL, showing the testbench catches the bugs)
-# ======================================================================================
+# ==TEST 2: components_tb on broken_components.v (should FAIL, showing the testbench catches the bugs)==
 # vsim -quiet -voptargs="+acc" rt_work.components_tb 
-# Start time: 13:11:17 on Oct 18,2026
+# Start time: 14:14:02 on Oct 18,2026
 # ALU FAIL: op=010 a=9000 b=3000 got=5999 (176f) expected=6000 (1770)
 # ALU FAIL: op=010 a=3000 b=9000 got=-6001 (e88f) expected=-6000 (e890)
 # ALU FAIL: op=010 a=7777 b=7777 got=-1 (ffff) expected=0 (0000)
@@ -364,125 +392,57 @@ do run_tests.do
 # ** Note: $stop    : components_tb.v(836)
 #    Time: 512 ns  Iteration: 1  Instance: /components_tb
 # Break in Module components_tb at components_tb.v line 836
-# End time: 13:12:44 on Oct 18,2026, Elapsed time: 0:01:27
+# End time: 14:15:28 on Oct 18,2026, Elapsed time: 0:01:26
 # Errors: 0, Warnings: 0
 # 
-# ======================================================================================
-#  TEST 3: proc_extension_tb on proc_extension.v (should PASS)
-# ======================================================================================
+# ==TEST 3: proc_extension_tb on proc_extension.v (should PASS)==
 # vsim -quiet -voptargs="+acc" rt_work.proc_extension_tb 
-# Start time: 13:12:44 on Oct 18,2026
-# ==================================================
-#  ECE2072 extended_proc testbench (Task 3)
-#  clock period = 10 ns, random instructions = 500
-# ==================================================
-# --- Section 1: Reset
-#     [PASS] 3 checks passed
-# --- Section 2: tick_FSM sequence
-#     [PASS] 24 checks passed
-# --- Section 3: movi
-#     movi r0, 0 : R0 0 -> 0 (0x0000)
-#     movi r1, 1 : R1 0 -> 1 (0x0001)
-#     movi r2, 255 : R2 0 -> 255 (0x00ff)
-#     movi r3, -1 : R3 0 -> -1 (0xffff)
-#     movi r4, -256 : R4 0 -> -256 (0xff00)
-#     movi r5, 127 : R5 0 -> 127 (0x007f)
-#     movi r6, -127 : R6 0 -> -127 (0xff81)
-#     movi r7, 170 : R7 0 -> 170 (0x00aa)
-#     [PASS] 99 checks passed
-# --- Section 4: addi
-#     addi r0, 0 : R0 5 -> 5 (0x0005)
-#     addi r1, 9 : R1 -9 -> 0 (0x0000)
-#     addi r2, 255 : R2 100 -> 355 (0x0163)
-#     addi r3, -256 : R3 -100 -> -356 (0xfe9c)
-#     addi r4, -1 : R4 255 -> 254 (0x00fe)
-#     addi r5, 255 : R5 -256 -> -1 (0xffff)
-#     addi r7, -33 : R7 33 -> 0 (0x0000)
-#     [PASS] 171 checks passed
-# --- Section 5: Task 3: mul, ssi and disp
-#     [PASS] 5 checks passed
-# 
-#  TEST SUMMARY
-#   PASS  Reset (3 checks)
-#   PASS  tick_FSM sequence (24 checks)
-#   PASS  movi (99 checks)
-#   PASS  addi (171 checks)
-#   PASS  Task 3: mul, ssi and disp (5 checks)
-#  ALL 302 CHECKS PASSED
-# ** Note: $stop    : proc_extension_tb.v(642)
-#    Time: 1426 ns  Iteration: 0  Instance: /proc_extension_tb
-# Break in Module proc_extension_tb at proc_extension_tb.v line 642
-# End time: 13:14:10 on Oct 18,2026, Elapsed time: 0:01:26
+# Start time: 14:15:28 on Oct 18,2026
+# ==TEST SUMMARY==
+# reset : 0 failed
+# tick FSM : 0 failed
+# movi : 0 failed
+# addi : 0 failed
+# mul : 0 failed
+# ssi : 0 failed
+# disp : 0 failed
+# ** Note: $stop    : proc_extension_tb.v(516)
+#    Time: 3011 ns  Iteration: 1  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at proc_extension_tb.v line 516
+# End time: 14:16:54 on Oct 18,2026, Elapsed time: 0:01:26
 # Errors: 0, Warnings: 0
 # 
-# ======================================================================================
-#  TEST 4: proc_extension_tb on broken_proc_extension.v (should FAIL, showing the testbench catches the bugs)
-# ======================================================================================
+# ==TEST 4: proc_extension_tb on broken_proc_extension.v (should FAIL, showing the testbench catches the bugs)==
 # vsim -quiet -voptargs="+acc" rt_work.proc_extension_tb 
-# Start time: 13:14:10 on Oct 18,2026
-# ==================================================
-#  ECE2072 extended_proc testbench (Task 3)
-#  clock period = 10 ns, random instructions = 500
-# ==================================================
-# --- Section 1: Reset
-#     [PASS] 3 checks passed
-# --- Section 2: tick_FSM sequence
-#     [PASS] 24 checks passed
-# --- Section 3: movi
-#     movi r0, 0 : R0 0 -> 0 (0x0000)
-#     movi r1, 1 : R1 0 -> 1 (0x0001)
-#     movi r2, 255 : R2 0 -> 255 (0x00ff)
-#     movi r3, -1 : R3 0 -> -1 (0xffff)
-#     movi r4, -256 : R4 0 -> -256 (0xff00)
-#     movi r5, 127 : R5 0 -> 127 (0x007f)
-#     movi r6, -127 : R6 0 -> -127 (0xff81)
-#     movi r7, 170 : R7 0 -> 170 (0x00aa)
-#     [PASS] 99 checks passed
-# --- Section 4: addi
-#     addi r0, 0 : R0 5 -> 5 (0x0005)
-#     addi r1, 9 : R1 -9 -> 0 (0x0000)
-#     addi r2, 255 : R2 100 -> 355 (0x0163)
-#     addi r3, -256 : R3 -100 -> -356 (0xfe9c)
-#     addi r4, -1 : R4 255 -> 254 (0x00fe)
-#     addi r5, 255 : R5 -256 -> -1 (0xffff)
-#     addi r7, -33 : R7 33 -> 0 (0x0000)
-#     [PASS] 171 checks passed
-# --- Section 5: Task 3: mul, ssi and disp
-#   [FAIL] t=1226 ns | mul: 6 * -7 = -42 | expected -42 (0xffd6), got -1 (0xffff)
-#          while executing: mul r1, r2
-#   [FAIL] t=1306 ns | ssi: 5 shifted left by 3 = 40 | expected 40 (0x0028), got 0 (0x0000)
-#          while executing: ssi r3, 3   (immediate word = 9'b000000011)
-#   [FAIL] t=1346 ns | ssi: 40 shifted right by 2 = 10 | expected 10 (0x000a), got 0 (0x0000)
-#          while executing: ssi r3, -2   (immediate word = 9'b111111110)
-#   [FAIL] t=1386 ns | disp: display = R3 (10) | expected 10 (0x000a), got 0 (0x0000)
-#          while executing: disp r3, r0
-#   [FAIL] t=1426 ns | disp: display still 10 after R3 = 11 | expected 10 (0x000a), got 0 (0x0000)
-#          while executing: addi r3, 1   (immediate word = 9'b000000001)
-#     [FAIL] 5 of 5 checks failed
-# 
-#  TEST SUMMARY
-#   PASS  Reset (3 checks)
-#   PASS  tick_FSM sequence (24 checks)
-#   PASS  movi (99 checks)
-#   PASS  addi (171 checks)
-#   FAIL  Task 3: mul, ssi and disp (5 of 5 checks failed)
-#  5 OF 302 CHECKS FAILED, see the [FAIL] lines above
-# ** Note: $stop    : proc_extension_tb.v(642)
-#    Time: 1426 ns  Iteration: 0  Instance: /proc_extension_tb
-# Break in Module proc_extension_tb at proc_extension_tb.v line 642
-# End time: 13:15:39 on Oct 18,2026, Elapsed time: 0:01:29
+# Start time: 14:16:55 on Oct 18,2026
+# mul FAIL at t=2491000 during mul r1, r2: R1 got=-1 (ffff) expected=-42 (ffd6)
+# mul: 1 checks failed
+# ssi FAIL at t=2671000 during ssi r3, 3: R3 got=0 (0000) expected=40 (0028)
+# ssi FAIL at t=2751000 during ssi r3, -2: R3 got=0 (0000) expected=10 (000a)
+# ssi: 2 checks failed
+# disp FAIL at t=2931000 during disp r3: display got=0 (0000) expected=10 (000a)
+# disp FAIL at t=3011000 during addi r3, 1: display got=0 (0000) expected=10 (000a)
+# disp: 2 checks failed
+# ==TEST SUMMARY==
+# reset : 0 failed
+# tick FSM : 0 failed
+# movi : 0 failed
+# addi : 0 failed
+# mul : 1 failed
+# ssi : 2 failed
+# disp : 2 failed
+# ** Note: $stop    : proc_extension_tb.v(516)
+#    Time: 3011 ns  Iteration: 1  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at proc_extension_tb.v line 516
+# End time: 14:18:21 on Oct 18,2026, Elapsed time: 0:01:26
 # Errors: 0, Warnings: 0
 # 
-# ======================================================================================
-#  SUMMARY
-# ======================================================================================
-#  Test  Testbench          Design                   Expected  Result  Details
-# --------------------------------------------------------------------------------------
-#  1     components_tb      components.v             PASS      PASS    0 failures in any component
-#  2     components_tb      broken_components.v      FAIL      FAIL    274 failures: sign extender 256, tick FSM 6, alu 12
-#  3     proc_extension_tb  proc_extension.v         PASS      PASS    all 302 checks passed
-#  4     proc_extension_tb  broken_proc_extension.v  FAIL      FAIL    5 of 302 checks failed, all in section 5 (section 5 is mul, ssi and disp)
-# --------------------------------------------------------------------------------------
-#  components_tb      WORKS: passes the working design and catches the bugs in the broken one
-#  proc_extension_tb  WORKS: passes the working design and catches the bugs in the broken one
-# ======================================================================================
+# ==RUN_TESTS SUMMARY==
+# Test  Testbench          Design                   Expected  Result  Details
+# 1     components_tb      components.v             PASS      PASS    0 checks failed
+# 2     components_tb      broken_components.v      FAIL      FAIL    274 checks failed: sign extender 256, tick FSM 6, alu 12
+# 3     proc_extension_tb  proc_extension.v         PASS      PASS    0 checks failed
+# 4     proc_extension_tb  broken_proc_extension.v  FAIL      FAIL    5 checks failed: mul 1, ssi 2, disp 2
+# 
+# components_tb      WORKS: passes the working design and catches the bugs in the broken one
+# proc_extension_tb  WORKS: passes the working design and catches the bugs in the broken one
