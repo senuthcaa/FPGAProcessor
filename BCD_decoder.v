@@ -2,7 +2,7 @@
 /*
 
 -Hoorad 36166804
-
+-Senuth 36180513
 */
 
 //converts a signed 16-bit value into a negative flag and 5 BCD digits

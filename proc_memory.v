@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 /*
 
--Senuth 36180513:
-
+-Senuth 36180513
+-Hoorad 36166804
 
 */
 module memory_proc (

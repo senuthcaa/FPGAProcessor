@@ -1,8 +1,6 @@
 `timescale 1ns / 1ps
 /*
 
-
-Please enter your student ID:
 -Senuth 36180513
 -Hoorad 36166804
 
