@@ -65,7 +65,6 @@ set_global_assignment -name VERILOG_FILE top_level_extension.v
 set_global_assignment -name VERILOG_FILE BCD_decoder.v
 set_global_assignment -name VERILOG_FILE proc_memory.v
 set_global_assignment -name VERILOG_FILE top_level_memory.v
-set_global_assignment -name VERILOG_FILE proc_memory_tb.v
 set_global_assignment -name QIP_FILE instruction_ROM.qip
 set_global_assignment -name SDC_FILE ECE2072Project.sdc
 # the 10 Hz processor clock must reach every processor register at the same time, so keep it on a global clock network
