@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains Verilog code to implement the DE10-Lite top level for Task 3,
-    which connects the extended x72 processor to the switches, keys, LEDs and HEX5 to HEX0.
 
-Please enter your name and student ID:
 -Senuth 36180513
--
+-Hoorad 36166804
 
 */
 module top_level_extension (
@@ -22,15 +18,15 @@ module top_level_extension (
 	output reg [6:0] HEX5
 );
 
-	//SW[9] -> processor enable
-	//SW[8:0] -> processor din
-	//~KEY[0] -> synchronous processor rst
-	//~KEY[1] -> processor clk
-	//bus[9:0] -> LEDR[9:0]
-	//display -> HEX4 to HEX0 as a signed decimal, all five decimal points light when it is negative
-	//tick_FSM -> HEX5
+	//SW[9] processor enable
+	//SW[8:0] processor din
+	//~KEY[0] synchronous processor rst
+	//~KEY[1] processor clk
+	//bus[9:0] LEDR[9:0]
+	//display  HEX4 to HEX0 as a signed decimal, all five decimal points light when it is negative
+	//tick_FSM HEX5
 
-	//tick states, from components.v
+	//tick states from components.v
 	localparam
 		DIN_READ = 4'b0001,
 		BUS_WRITE_ONE = 4'b0010,
@@ -51,7 +47,6 @@ module top_level_extension (
 		.display(display),
 		.tick_FSM(tick),
 
-		//testbench outputs not required on hardware
 		.R0(),
 		.R1(),
 		.R2(),
@@ -75,7 +70,7 @@ module top_level_extension (
 		.hex4(HEX4)
 	);
 
-	//display current tick on HEX5, de10-lite seven-segment displays are active-low
+	//display current tick on seven segment displays- are active-low
 	always @(*) begin
 		case (tick)
 			DIN_READ : HEX5 = 7'b1111001; //1
