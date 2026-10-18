@@ -16,3 +16,5 @@ simulation/qsim/
 work/
 transcript
 *.wlf
+# run_tests.do temporary library
+rt_work/
