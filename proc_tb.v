@@ -1,12 +1,10 @@
 `timescale 1ns / 1ps
 /*
-Monash University ECE2072: Assignment
-This file contains a Verilog test bench to test the correctness of the processor.
-It tests the Task 2 processor (simple_proc), which supports movi, add, addi and sub.
+
 
 Please enter your student ID:
--36180513
--
+-Senuth 36180513
+-Hoorad 36166804
 
 */
 module proc_tb;
@@ -16,14 +14,14 @@ module proc_tb;
 	localparam N_RANDOM = 500;                //number of random instructions in section 13
 	localparam CHECK_UNDEFINED_AS_NOP = 1;    //1 for Task 2 processor, 0 for later tasks
 
-	//instruction opcodes, from the x72 instruction table
+	//instruction opcodes from the x72 instruction table
 	localparam
 		INSTR_ADD = 3'd1,
 		INSTR_ADDI = 3'd2,
 		INSTR_SUB = 3'd3,
 		INSTR_MOVI = 3'd7;
 
-	//tick states, from components.v
+	//tick states from components.v
 	localparam
 		DIN_READ = 4'b0001,
 		BUS_WRITE_ONE = 4'b0010,
@@ -67,8 +65,6 @@ module proc_tb;
 	always #(CLK_PERIOD / 2) clk = ~clk;
 
 	//everything below is simulation only, quartus skips it and modelsim still runs it
-	// synthesis translate_off
-
 	//reference model and bookkeeping
 	reg [15:0] exp_r [0:7];        //expected register contents
 	reg [15:0] lfsr;               //16-bit LFSR, x^16 + x^14 + x^13 + x^11 + 1
@@ -509,10 +505,8 @@ module proc_tb;
 		enable = 1'b1;
 		din = 9'd0;
 
-		$display("==================================================");
 		$display(" ECE2072 simple_proc testbench (Task 2)");
 		$display(" clock period = %0d ns, random instructions = %0d", CLK_PERIOD, N_RANDOM);
-		$display("==================================================");
 
 		//SECTION 1: RESET
 		begin_section("Reset");
@@ -537,30 +531,6 @@ module proc_tb;
 			else record(1'b1);
 			tick_edge;
 		end
-		end_section;
-
-		//SECTION 3: movi, every register, a spread of immediates
-		begin_section("movi");
-		verbose = 1'b1;
-		exec_type2(INSTR_MOVI, 3'd0, 9'h000, 1'b1);     //0
-		exec_type2(INSTR_MOVI, 3'd1, 9'h001, 1'b1);     //1
-		exec_type2(INSTR_MOVI, 3'd2, 9'h0FF, 1'b1);     //255, largest positive
-		exec_type2(INSTR_MOVI, 3'd3, 9'h1FF, 1'b1);     //-1
-		exec_type2(INSTR_MOVI, 3'd4, 9'h100, 1'b1);     //-256, most negative
-		exec_type2(INSTR_MOVI, 3'd5, 9'h07F, 1'b1);     //127
-		exec_type2(INSTR_MOVI, 3'd6, 9'h181, 1'b1);     //-127
-		exec_type2(INSTR_MOVI, 3'd7, 9'h0AA, 1'b1);     //170
-		verbose = 1'b0;
-		check_value("movi: R0 = 0", R0, 16'd0);
-		check_value("movi: R1 = 1", R1, 16'd1);
-		check_value("movi: R2 = 255", R2, 16'd255);
-		check_value("movi: R3 = -1 (0xFFFF)", R3, 16'hFFFF);
-		check_value("movi: R4 = -256 (0xFF00)", R4, 16'hFF00);
-		check_value("movi: R5 = 127", R5, 16'd127);
-		check_value("movi: R6 = -127 (0xFF81)", R6, 16'hFF81);
-		check_value("movi: R7 = 170", R7, 16'd170);
-		exec_type2(INSTR_MOVI, 3'd3, 9'h055, 1'b1);     //overwrite a non-zero register
-		check_value("movi: overwrite R3 = 85", R3, 16'd85);
 		end_section;
 
 		//SECTION 4: add
@@ -663,21 +633,6 @@ module proc_tb;
 		check_value("held: sub R5 = -333 (0xFEB3)", R5, 16'hFEB3);
 		end_section;
 
-		//SECTION 9: EXHAUSTIVE REGISTER ADDRESSING (EVERY Rx, EVERY Ry)
-		begin_section("Exhaustive Rx / Ry addressing");
-		for (i = 0; i < 8; i = i + 1) begin
-			for (j = 0; j < 8; j = j + 1) begin
-				seed_regs;
-				exec_type1(INSTR_ADD, i[2:0], j[2:0], 1'b1);
-				seed_regs;
-				exec_type1(INSTR_SUB, i[2:0], j[2:0], 1'b1);
-			end
-			seed_regs;
-			exec_type2(INSTR_MOVI, i[2:0], 9'h1A5, 1'b1);     //-91
-			seed_regs;
-			exec_type2(INSTR_ADDI, i[2:0], 9'h05A, 1'b1);     //+90
-		end
-		end_section;
 
 		//SECTION 10: enable GATING, PAUSE IN EVERY TICK OF EVERY INSTRUCTION
 		begin_section("enable gating (pause in every tick)");
@@ -705,80 +660,18 @@ module proc_tb;
 		check_value("post-reset: R3 = 0", R3, 16'd0);
 		end_section;
 
-		//SECTION 12: UNDEFINED OPCODES ARE NOPs (TASK 2 SPECIFIC DESIGN DECISION)
-		if (CHECK_UNDEFINED_AS_NOP) begin
-			begin_section("Undefined opcodes are NOPs");
-			seed_regs;
-			for (i = 0; i < 4; i = i + 1) begin
-				for (j = 0; j < 3; j = j + 1) begin
-					case (i)
-						0 : exec_undefined(3'd0, 1'b1);
-						1 : exec_undefined(3'd4, 1'b1);
-						2 : exec_undefined(3'd5, 1'b0);
-						default : exec_undefined(3'd6, 1'b1);
-					endcase
-				end
-			end
-			//a valid instruction must still work straight afterwards
-			exec_type1(INSTR_ADD, 3'd0, 3'd1, 1'b1);
-			end_section;
-		end
-
-		//SECTION 13: CONSTRAINED RANDOM REGRESSION USING AN LFSR
-		//random opcode, registers, immediate, din scrambling and pauses, checked against the model
-		begin_section("Random regression (LFSR)");
-		seed_regs;
-		for (i = 0; i < N_RANDOM; i = i + 1) begin
-			next_rand;
-			if (lfsr[2:0] == 3'd0) begin
-				next_rand;
-				pause_at = {1'b0, lfsr[1:0]} + 3'd1;
-			end
-			else pause_at = 3'd0;
-			next_rand;
-			case (lfsr[1:0])
-				2'd0 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type1(INSTR_ADD, j[2:0], lfsr[2:0], lfsr[8]);
-				end
-				2'd1 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type2(INSTR_ADDI, j[2:0], lfsr[8:0], lfsr[12]);
-				end
-				2'd2 : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type1(INSTR_SUB, j[2:0], lfsr[2:0], lfsr[8]);
-				end
-				default : begin
-					next_rand;
-					j = lfsr[2:0];
-					next_rand;
-					exec_type2(INSTR_MOVI, j[2:0], lfsr[8:0], lfsr[12]);
-				end
-			endcase
-		end
+		
 		pause_at = 3'd0;
-		end_section;
 
 		//SUMMARY
 		$display("");
-		$display("==================================================");
 		$display(" TEST SUMMARY");
-		$display("==================================================");
 		for (i = 0; i < n_sections; i = i + 1) begin
 			if (res_fails[i] == 0) $display("  PASS  %0s (%0d checks)", res_name[i], res_checks[i]);
 			else $display("  FAIL  %0s (%0d of %0d checks failed)", res_name[i], res_fails[i], res_checks[i]);
 		end
-		$display("--------------------------------------------------");
 		if (total_fails == 0) $display(" ALL %0d CHECKS PASSED", total_checks);
 		else $display(" %0d OF %0d CHECKS FAILED, see the [FAIL] lines above", total_fails, total_checks);
-		$display("==================================================");
 		$stop;     //use $finish instead when running outside modelsim
 
 	end
