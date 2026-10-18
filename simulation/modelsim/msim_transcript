@@ -10,29 +10,19 @@
 # Copying C:/intelFPGA_lite/18.1/modelsim_ae/win32aloem/../modelsim.ini to modelsim.ini
 # Modifying modelsim.ini
 # 
-# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v}
+# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v}
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 14:58:58 on Oct 14,2026
-# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v 
-# -- Compiling module proc_extension_tb
+# Start time: 13:09:55 on Oct 18,2026
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components_tb.v 
+# -- Compiling module components_tb
 # 
 # Top level modules:
-# 	proc_extension_tb
-# End time: 14:58:58 on Oct 14,2026, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 0
-# vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v}
-# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 14:58:59 on Oct 14,2026
-# vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension.v 
-# -- Compiling module extended_proc
-# 
-# Top level modules:
-# 	extended_proc
-# End time: 14:58:59 on Oct 14,2026, Elapsed time: 0:00:00
+# 	components_tb
+# End time: 13:09:55 on Oct 18,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vlog -vlog01compat -work work +incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor {C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v}
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 14:58:59 on Oct 14,2026
+# Start time: 13:09:55 on Oct 18,2026
 # vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor" C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/components.v 
 # -- Compiling module sign_extend
 # -- Compiling module tick_FSM
@@ -46,12 +36,18 @@
 # 	multiplexer
 # 	alu
 # 	register_n
-# End time: 14:58:59 on Oct 14,2026, Elapsed time: 0:00:00
+# End time: 13:09:55 on Oct 18,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # 
-vsim work.proc_extension_tb proc_extension.v
-# vsim work.proc_extension_tb 
-# Start time: 14:59:27 on Oct 14,2026
+do run_tests.do
+# reading C:/intelFPGA_lite/18.1/modelsim_ae/win32aloem/../modelsim.ini
+# run_tests.do: running in C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor
+# 
+# ======================================================================================
+#  TEST 1: components_tb on components.v (should PASS)
+# ======================================================================================
+# vsim -quiet -voptargs="+acc" rt_work.components_tb 
+# Start time: 13:10:31 on Oct 18,2026
 # //  ModelSim - Intel FPGA Edition 10.5b Oct  5 2016
 # //
 # //  Copyright 1991-2016 Mentor Graphics Corporation
@@ -65,15 +61,317 @@ vsim work.proc_extension_tb proc_extension.v
 # //  is prohibited from disclosure under the Trade Secrets Act,
 # //  18 U.S.C. Section 1905.
 # //
-# Loading work.proc_extension_tb
-# Loading work.extended_proc
-# Loading work.sign_extend
-# Loading work.tick_FSM
-# Loading work.multiplexer
-# Loading work.alu
-# Loading work.register_n
-# OpenFile proc_extension.v
-run -all
+# ==TEST SUMMARY==
+# sign extender : 0 failed
+# tick FSM : 0 failed
+# mux : 0 failed
+# alu : 0 failed
+# register_n : 0 failed
+# ** Note: $stop    : components_tb.v(836)
+#    Time: 512 ns  Iteration: 1  Instance: /components_tb
+# Break in Module components_tb at components_tb.v line 836
+# End time: 13:11:17 on Oct 18,2026, Elapsed time: 0:00:46
+# Errors: 0, Warnings: 0
+# 
+# ======================================================================================
+#  TEST 2: components_tb on broken_components.v (should FAIL, showing the testbench catches the bugs)
+# ======================================================================================
+# vsim -quiet -voptargs="+acc" rt_work.components_tb 
+# Start time: 13:11:17 on Oct 18,2026
+# ALU FAIL: op=010 a=9000 b=3000 got=5999 (176f) expected=6000 (1770)
+# ALU FAIL: op=010 a=3000 b=9000 got=-6001 (e88f) expected=-6000 (e890)
+# ALU FAIL: op=010 a=7777 b=7777 got=-1 (ffff) expected=0 (0000)
+# ALU FAIL: op=010 a=500 b=-1500 got=1999 (07cf) expected=2000 (07d0)
+# ALU FAIL: op=010 a=-500 b=1500 got=-2001 (f82f) expected=-2000 (f830)
+# ALU FAIL: op=010 a=-500 b=-1500 got=999 (03e7) expected=1000 (03e8)
+# ALU FAIL: op=010 a=-12345 b=0 got=-12346 (cfc6) expected=-12345 (cfc7)
+# ALU FAIL: op=010 a=0 b=12345 got=-12346 (cfc6) expected=-12345 (cfc7)
+# ALU FAIL: op=010 a=32767 b=-1 got=32767 (7fff) expected=-32768 (8000)
+# ALU FAIL: op=010 a=-32768 b=1 got=32766 (7ffe) expected=32767 (7fff)
+# ALU FAIL: op=010 a=0 b=-32768 got=32767 (7fff) expected=-32768 (8000)
+# ALU FAIL: op=010 a=30000 b=-30000 got=-5537 (ea5f) expected=-5536 (ea60)
+# ALU: 12 checks failed
+# tick FSM FAIL at t=171000: rst=0 enable=0 got=1000 expected=0100
+# tick FSM FAIL at t=191000: rst=0 enable=0 got=0001 expected=0100
+# tick FSM FAIL at t=211000: rst=0 enable=0 got=0010 expected=0100
+# tick FSM FAIL at t=231000: rst=0 enable=1 got=0100 expected=1000
+# tick FSM FAIL at t=251000: rst=0 enable=1 got=1000 expected=0001
+# sign extender FAIL: in=256  got=0000000100000000  expected=1111111100000000
+# sign extender FAIL: in=257  got=0000000100000001  expected=1111111100000001
+# sign extender FAIL: in=258  got=0000000100000010  expected=1111111100000010
+# sign extender FAIL: in=259  got=0000000100000011  expected=1111111100000011
+# sign extender FAIL: in=260  got=0000000100000100  expected=1111111100000100
+# sign extender FAIL: in=261  got=0000000100000101  expected=1111111100000101
+# sign extender FAIL: in=262  got=0000000100000110  expected=1111111100000110
+# sign extender FAIL: in=263  got=0000000100000111  expected=1111111100000111
+# sign extender FAIL: in=264  got=0000000100001000  expected=1111111100001000
+# sign extender FAIL: in=265  got=0000000100001001  expected=1111111100001001
+# sign extender FAIL: in=266  got=0000000100001010  expected=1111111100001010
+# sign extender FAIL: in=267  got=0000000100001011  expected=1111111100001011
+# sign extender FAIL: in=268  got=0000000100001100  expected=1111111100001100
+# sign extender FAIL: in=269  got=0000000100001101  expected=1111111100001101
+# sign extender FAIL: in=270  got=0000000100001110  expected=1111111100001110
+# tick FSM FAIL at t=271000: rst=0 enable=1 got=0001 expected=0010
+# sign extender FAIL: in=271  got=0000000100001111  expected=1111111100001111
+# sign extender FAIL: in=272  got=0000000100010000  expected=1111111100010000
+# sign extender FAIL: in=273  got=0000000100010001  expected=1111111100010001
+# sign extender FAIL: in=274  got=0000000100010010  expected=1111111100010010
+# sign extender FAIL: in=275  got=0000000100010011  expected=1111111100010011
+# sign extender FAIL: in=276  got=0000000100010100  expected=1111111100010100
+# sign extender FAIL: in=277  got=0000000100010101  expected=1111111100010101
+# sign extender FAIL: in=278  got=0000000100010110  expected=1111111100010110
+# sign extender FAIL: in=279  got=0000000100010111  expected=1111111100010111
+# sign extender FAIL: in=280  got=0000000100011000  expected=1111111100011000
+# sign extender FAIL: in=281  got=0000000100011001  expected=1111111100011001
+# sign extender FAIL: in=282  got=0000000100011010  expected=1111111100011010
+# sign extender FAIL: in=283  got=0000000100011011  expected=1111111100011011
+# sign extender FAIL: in=284  got=0000000100011100  expected=1111111100011100
+# sign extender FAIL: in=285  got=0000000100011101  expected=1111111100011101
+# sign extender FAIL: in=286  got=0000000100011110  expected=1111111100011110
+# sign extender FAIL: in=287  got=0000000100011111  expected=1111111100011111
+# sign extender FAIL: in=288  got=0000000100100000  expected=1111111100100000
+# sign extender FAIL: in=289  got=0000000100100001  expected=1111111100100001
+# sign extender FAIL: in=290  got=0000000100100010  expected=1111111100100010
+# sign extender FAIL: in=291  got=0000000100100011  expected=1111111100100011
+# sign extender FAIL: in=292  got=0000000100100100  expected=1111111100100100
+# sign extender FAIL: in=293  got=0000000100100101  expected=1111111100100101
+# sign extender FAIL: in=294  got=0000000100100110  expected=1111111100100110
+# sign extender FAIL: in=295  got=0000000100100111  expected=1111111100100111
+# sign extender FAIL: in=296  got=0000000100101000  expected=1111111100101000
+# sign extender FAIL: in=297  got=0000000100101001  expected=1111111100101001
+# sign extender FAIL: in=298  got=0000000100101010  expected=1111111100101010
+# sign extender FAIL: in=299  got=0000000100101011  expected=1111111100101011
+# tick FSM: 6 checks failed
+# sign extender FAIL: in=300  got=0000000100101100  expected=1111111100101100
+# sign extender FAIL: in=301  got=0000000100101101  expected=1111111100101101
+# sign extender FAIL: in=302  got=0000000100101110  expected=1111111100101110
+# sign extender FAIL: in=303  got=0000000100101111  expected=1111111100101111
+# sign extender FAIL: in=304  got=0000000100110000  expected=1111111100110000
+# sign extender FAIL: in=305  got=0000000100110001  expected=1111111100110001
+# sign extender FAIL: in=306  got=0000000100110010  expected=1111111100110010
+# sign extender FAIL: in=307  got=0000000100110011  expected=1111111100110011
+# sign extender FAIL: in=308  got=0000000100110100  expected=1111111100110100
+# sign extender FAIL: in=309  got=0000000100110101  expected=1111111100110101
+# sign extender FAIL: in=310  got=0000000100110110  expected=1111111100110110
+# sign extender FAIL: in=311  got=0000000100110111  expected=1111111100110111
+# sign extender FAIL: in=312  got=0000000100111000  expected=1111111100111000
+# sign extender FAIL: in=313  got=0000000100111001  expected=1111111100111001
+# sign extender FAIL: in=314  got=0000000100111010  expected=1111111100111010
+# sign extender FAIL: in=315  got=0000000100111011  expected=1111111100111011
+# sign extender FAIL: in=316  got=0000000100111100  expected=1111111100111100
+# sign extender FAIL: in=317  got=0000000100111101  expected=1111111100111101
+# sign extender FAIL: in=318  got=0000000100111110  expected=1111111100111110
+# sign extender FAIL: in=319  got=0000000100111111  expected=1111111100111111
+# sign extender FAIL: in=320  got=0000000101000000  expected=1111111101000000
+# sign extender FAIL: in=321  got=0000000101000001  expected=1111111101000001
+# sign extender FAIL: in=322  got=0000000101000010  expected=1111111101000010
+# sign extender FAIL: in=323  got=0000000101000011  expected=1111111101000011
+# sign extender FAIL: in=324  got=0000000101000100  expected=1111111101000100
+# sign extender FAIL: in=325  got=0000000101000101  expected=1111111101000101
+# sign extender FAIL: in=326  got=0000000101000110  expected=1111111101000110
+# sign extender FAIL: in=327  got=0000000101000111  expected=1111111101000111
+# sign extender FAIL: in=328  got=0000000101001000  expected=1111111101001000
+# sign extender FAIL: in=329  got=0000000101001001  expected=1111111101001001
+# sign extender FAIL: in=330  got=0000000101001010  expected=1111111101001010
+# sign extender FAIL: in=331  got=0000000101001011  expected=1111111101001011
+# sign extender FAIL: in=332  got=0000000101001100  expected=1111111101001100
+# sign extender FAIL: in=333  got=0000000101001101  expected=1111111101001101
+# sign extender FAIL: in=334  got=0000000101001110  expected=1111111101001110
+# sign extender FAIL: in=335  got=0000000101001111  expected=1111111101001111
+# sign extender FAIL: in=336  got=0000000101010000  expected=1111111101010000
+# sign extender FAIL: in=337  got=0000000101010001  expected=1111111101010001
+# sign extender FAIL: in=338  got=0000000101010010  expected=1111111101010010
+# sign extender FAIL: in=339  got=0000000101010011  expected=1111111101010011
+# sign extender FAIL: in=340  got=0000000101010100  expected=1111111101010100
+# sign extender FAIL: in=341  got=0000000101010101  expected=1111111101010101
+# sign extender FAIL: in=342  got=0000000101010110  expected=1111111101010110
+# sign extender FAIL: in=343  got=0000000101010111  expected=1111111101010111
+# sign extender FAIL: in=344  got=0000000101011000  expected=1111111101011000
+# sign extender FAIL: in=345  got=0000000101011001  expected=1111111101011001
+# sign extender FAIL: in=346  got=0000000101011010  expected=1111111101011010
+# sign extender FAIL: in=347  got=0000000101011011  expected=1111111101011011
+# sign extender FAIL: in=348  got=0000000101011100  expected=1111111101011100
+# sign extender FAIL: in=349  got=0000000101011101  expected=1111111101011101
+# sign extender FAIL: in=350  got=0000000101011110  expected=1111111101011110
+# sign extender FAIL: in=351  got=0000000101011111  expected=1111111101011111
+# sign extender FAIL: in=352  got=0000000101100000  expected=1111111101100000
+# sign extender FAIL: in=353  got=0000000101100001  expected=1111111101100001
+# sign extender FAIL: in=354  got=0000000101100010  expected=1111111101100010
+# sign extender FAIL: in=355  got=0000000101100011  expected=1111111101100011
+# sign extender FAIL: in=356  got=0000000101100100  expected=1111111101100100
+# sign extender FAIL: in=357  got=0000000101100101  expected=1111111101100101
+# sign extender FAIL: in=358  got=0000000101100110  expected=1111111101100110
+# sign extender FAIL: in=359  got=0000000101100111  expected=1111111101100111
+# sign extender FAIL: in=360  got=0000000101101000  expected=1111111101101000
+# sign extender FAIL: in=361  got=0000000101101001  expected=1111111101101001
+# sign extender FAIL: in=362  got=0000000101101010  expected=1111111101101010
+# sign extender FAIL: in=363  got=0000000101101011  expected=1111111101101011
+# sign extender FAIL: in=364  got=0000000101101100  expected=1111111101101100
+# sign extender FAIL: in=365  got=0000000101101101  expected=1111111101101101
+# sign extender FAIL: in=366  got=0000000101101110  expected=1111111101101110
+# sign extender FAIL: in=367  got=0000000101101111  expected=1111111101101111
+# sign extender FAIL: in=368  got=0000000101110000  expected=1111111101110000
+# sign extender FAIL: in=369  got=0000000101110001  expected=1111111101110001
+# sign extender FAIL: in=370  got=0000000101110010  expected=1111111101110010
+# sign extender FAIL: in=371  got=0000000101110011  expected=1111111101110011
+# sign extender FAIL: in=372  got=0000000101110100  expected=1111111101110100
+# sign extender FAIL: in=373  got=0000000101110101  expected=1111111101110101
+# sign extender FAIL: in=374  got=0000000101110110  expected=1111111101110110
+# sign extender FAIL: in=375  got=0000000101110111  expected=1111111101110111
+# sign extender FAIL: in=376  got=0000000101111000  expected=1111111101111000
+# sign extender FAIL: in=377  got=0000000101111001  expected=1111111101111001
+# sign extender FAIL: in=378  got=0000000101111010  expected=1111111101111010
+# sign extender FAIL: in=379  got=0000000101111011  expected=1111111101111011
+# sign extender FAIL: in=380  got=0000000101111100  expected=1111111101111100
+# sign extender FAIL: in=381  got=0000000101111101  expected=1111111101111101
+# sign extender FAIL: in=382  got=0000000101111110  expected=1111111101111110
+# sign extender FAIL: in=383  got=0000000101111111  expected=1111111101111111
+# sign extender FAIL: in=384  got=0000000110000000  expected=1111111110000000
+# sign extender FAIL: in=385  got=0000000110000001  expected=1111111110000001
+# sign extender FAIL: in=386  got=0000000110000010  expected=1111111110000010
+# sign extender FAIL: in=387  got=0000000110000011  expected=1111111110000011
+# sign extender FAIL: in=388  got=0000000110000100  expected=1111111110000100
+# sign extender FAIL: in=389  got=0000000110000101  expected=1111111110000101
+# sign extender FAIL: in=390  got=0000000110000110  expected=1111111110000110
+# sign extender FAIL: in=391  got=0000000110000111  expected=1111111110000111
+# sign extender FAIL: in=392  got=0000000110001000  expected=1111111110001000
+# sign extender FAIL: in=393  got=0000000110001001  expected=1111111110001001
+# sign extender FAIL: in=394  got=0000000110001010  expected=1111111110001010
+# sign extender FAIL: in=395  got=0000000110001011  expected=1111111110001011
+# sign extender FAIL: in=396  got=0000000110001100  expected=1111111110001100
+# sign extender FAIL: in=397  got=0000000110001101  expected=1111111110001101
+# sign extender FAIL: in=398  got=0000000110001110  expected=1111111110001110
+# sign extender FAIL: in=399  got=0000000110001111  expected=1111111110001111
+# sign extender FAIL: in=400  got=0000000110010000  expected=1111111110010000
+# sign extender FAIL: in=401  got=0000000110010001  expected=1111111110010001
+# sign extender FAIL: in=402  got=0000000110010010  expected=1111111110010010
+# sign extender FAIL: in=403  got=0000000110010011  expected=1111111110010011
+# sign extender FAIL: in=404  got=0000000110010100  expected=1111111110010100
+# sign extender FAIL: in=405  got=0000000110010101  expected=1111111110010101
+# sign extender FAIL: in=406  got=0000000110010110  expected=1111111110010110
+# sign extender FAIL: in=407  got=0000000110010111  expected=1111111110010111
+# sign extender FAIL: in=408  got=0000000110011000  expected=1111111110011000
+# sign extender FAIL: in=409  got=0000000110011001  expected=1111111110011001
+# sign extender FAIL: in=410  got=0000000110011010  expected=1111111110011010
+# sign extender FAIL: in=411  got=0000000110011011  expected=1111111110011011
+# sign extender FAIL: in=412  got=0000000110011100  expected=1111111110011100
+# sign extender FAIL: in=413  got=0000000110011101  expected=1111111110011101
+# sign extender FAIL: in=414  got=0000000110011110  expected=1111111110011110
+# sign extender FAIL: in=415  got=0000000110011111  expected=1111111110011111
+# sign extender FAIL: in=416  got=0000000110100000  expected=1111111110100000
+# sign extender FAIL: in=417  got=0000000110100001  expected=1111111110100001
+# sign extender FAIL: in=418  got=0000000110100010  expected=1111111110100010
+# sign extender FAIL: in=419  got=0000000110100011  expected=1111111110100011
+# sign extender FAIL: in=420  got=0000000110100100  expected=1111111110100100
+# sign extender FAIL: in=421  got=0000000110100101  expected=1111111110100101
+# sign extender FAIL: in=422  got=0000000110100110  expected=1111111110100110
+# sign extender FAIL: in=423  got=0000000110100111  expected=1111111110100111
+# sign extender FAIL: in=424  got=0000000110101000  expected=1111111110101000
+# sign extender FAIL: in=425  got=0000000110101001  expected=1111111110101001
+# sign extender FAIL: in=426  got=0000000110101010  expected=1111111110101010
+# sign extender FAIL: in=427  got=0000000110101011  expected=1111111110101011
+# sign extender FAIL: in=428  got=0000000110101100  expected=1111111110101100
+# sign extender FAIL: in=429  got=0000000110101101  expected=1111111110101101
+# sign extender FAIL: in=430  got=0000000110101110  expected=1111111110101110
+# sign extender FAIL: in=431  got=0000000110101111  expected=1111111110101111
+# sign extender FAIL: in=432  got=0000000110110000  expected=1111111110110000
+# sign extender FAIL: in=433  got=0000000110110001  expected=1111111110110001
+# sign extender FAIL: in=434  got=0000000110110010  expected=1111111110110010
+# sign extender FAIL: in=435  got=0000000110110011  expected=1111111110110011
+# sign extender FAIL: in=436  got=0000000110110100  expected=1111111110110100
+# sign extender FAIL: in=437  got=0000000110110101  expected=1111111110110101
+# sign extender FAIL: in=438  got=0000000110110110  expected=1111111110110110
+# sign extender FAIL: in=439  got=0000000110110111  expected=1111111110110111
+# sign extender FAIL: in=440  got=0000000110111000  expected=1111111110111000
+# sign extender FAIL: in=441  got=0000000110111001  expected=1111111110111001
+# sign extender FAIL: in=442  got=0000000110111010  expected=1111111110111010
+# sign extender FAIL: in=443  got=0000000110111011  expected=1111111110111011
+# sign extender FAIL: in=444  got=0000000110111100  expected=1111111110111100
+# sign extender FAIL: in=445  got=0000000110111101  expected=1111111110111101
+# sign extender FAIL: in=446  got=0000000110111110  expected=1111111110111110
+# sign extender FAIL: in=447  got=0000000110111111  expected=1111111110111111
+# sign extender FAIL: in=448  got=0000000111000000  expected=1111111111000000
+# sign extender FAIL: in=449  got=0000000111000001  expected=1111111111000001
+# sign extender FAIL: in=450  got=0000000111000010  expected=1111111111000010
+# sign extender FAIL: in=451  got=0000000111000011  expected=1111111111000011
+# sign extender FAIL: in=452  got=0000000111000100  expected=1111111111000100
+# sign extender FAIL: in=453  got=0000000111000101  expected=1111111111000101
+# sign extender FAIL: in=454  got=0000000111000110  expected=1111111111000110
+# sign extender FAIL: in=455  got=0000000111000111  expected=1111111111000111
+# sign extender FAIL: in=456  got=0000000111001000  expected=1111111111001000
+# sign extender FAIL: in=457  got=0000000111001001  expected=1111111111001001
+# sign extender FAIL: in=458  got=0000000111001010  expected=1111111111001010
+# sign extender FAIL: in=459  got=0000000111001011  expected=1111111111001011
+# sign extender FAIL: in=460  got=0000000111001100  expected=1111111111001100
+# sign extender FAIL: in=461  got=0000000111001101  expected=1111111111001101
+# sign extender FAIL: in=462  got=0000000111001110  expected=1111111111001110
+# sign extender FAIL: in=463  got=0000000111001111  expected=1111111111001111
+# sign extender FAIL: in=464  got=0000000111010000  expected=1111111111010000
+# sign extender FAIL: in=465  got=0000000111010001  expected=1111111111010001
+# sign extender FAIL: in=466  got=0000000111010010  expected=1111111111010010
+# sign extender FAIL: in=467  got=0000000111010011  expected=1111111111010011
+# sign extender FAIL: in=468  got=0000000111010100  expected=1111111111010100
+# sign extender FAIL: in=469  got=0000000111010101  expected=1111111111010101
+# sign extender FAIL: in=470  got=0000000111010110  expected=1111111111010110
+# sign extender FAIL: in=471  got=0000000111010111  expected=1111111111010111
+# sign extender FAIL: in=472  got=0000000111011000  expected=1111111111011000
+# sign extender FAIL: in=473  got=0000000111011001  expected=1111111111011001
+# sign extender FAIL: in=474  got=0000000111011010  expected=1111111111011010
+# sign extender FAIL: in=475  got=0000000111011011  expected=1111111111011011
+# sign extender FAIL: in=476  got=0000000111011100  expected=1111111111011100
+# sign extender FAIL: in=477  got=0000000111011101  expected=1111111111011101
+# sign extender FAIL: in=478  got=0000000111011110  expected=1111111111011110
+# sign extender FAIL: in=479  got=0000000111011111  expected=1111111111011111
+# sign extender FAIL: in=480  got=0000000111100000  expected=1111111111100000
+# sign extender FAIL: in=481  got=0000000111100001  expected=1111111111100001
+# sign extender FAIL: in=482  got=0000000111100010  expected=1111111111100010
+# sign extender FAIL: in=483  got=0000000111100011  expected=1111111111100011
+# sign extender FAIL: in=484  got=0000000111100100  expected=1111111111100100
+# sign extender FAIL: in=485  got=0000000111100101  expected=1111111111100101
+# sign extender FAIL: in=486  got=0000000111100110  expected=1111111111100110
+# sign extender FAIL: in=487  got=0000000111100111  expected=1111111111100111
+# sign extender FAIL: in=488  got=0000000111101000  expected=1111111111101000
+# sign extender FAIL: in=489  got=0000000111101001  expected=1111111111101001
+# sign extender FAIL: in=490  got=0000000111101010  expected=1111111111101010
+# sign extender FAIL: in=491  got=0000000111101011  expected=1111111111101011
+# sign extender FAIL: in=492  got=0000000111101100  expected=1111111111101100
+# sign extender FAIL: in=493  got=0000000111101101  expected=1111111111101101
+# sign extender FAIL: in=494  got=0000000111101110  expected=1111111111101110
+# sign extender FAIL: in=495  got=0000000111101111  expected=1111111111101111
+# sign extender FAIL: in=496  got=0000000111110000  expected=1111111111110000
+# sign extender FAIL: in=497  got=0000000111110001  expected=1111111111110001
+# sign extender FAIL: in=498  got=0000000111110010  expected=1111111111110010
+# sign extender FAIL: in=499  got=0000000111110011  expected=1111111111110011
+# sign extender FAIL: in=500  got=0000000111110100  expected=1111111111110100
+# sign extender FAIL: in=501  got=0000000111110101  expected=1111111111110101
+# sign extender FAIL: in=502  got=0000000111110110  expected=1111111111110110
+# sign extender FAIL: in=503  got=0000000111110111  expected=1111111111110111
+# sign extender FAIL: in=504  got=0000000111111000  expected=1111111111111000
+# sign extender FAIL: in=505  got=0000000111111001  expected=1111111111111001
+# sign extender FAIL: in=506  got=0000000111111010  expected=1111111111111010
+# sign extender FAIL: in=507  got=0000000111111011  expected=1111111111111011
+# sign extender FAIL: in=508  got=0000000111111100  expected=1111111111111100
+# sign extender FAIL: in=509  got=0000000111111101  expected=1111111111111101
+# sign extender FAIL: in=510  got=0000000111111110  expected=1111111111111110
+# sign extender FAIL: in=511  got=0000000111111111  expected=1111111111111111
+# sign extender: 256/512 failed
+# ==TEST SUMMARY==
+# sign extender : 256 failed
+# tick FSM : 6 failed
+# mux : 0 failed
+# alu : 12 failed
+# register_n : 0 failed
+# ** Note: $stop    : components_tb.v(836)
+#    Time: 512 ns  Iteration: 1  Instance: /components_tb
+# Break in Module components_tb at components_tb.v line 836
+# End time: 13:12:44 on Oct 18,2026, Elapsed time: 0:01:27
+# Errors: 0, Warnings: 0
+# 
+# ======================================================================================
+#  TEST 3: proc_extension_tb on proc_extension.v (should PASS)
+# ======================================================================================
+# vsim -quiet -voptargs="+acc" rt_work.proc_extension_tb 
+# Start time: 13:12:44 on Oct 18,2026
 # ==================================================
 #  ECE2072 extended_proc testbench (Task 3)
 #  clock period = 10 ns, random instructions = 500
@@ -92,15 +390,7 @@ run -all
 #     movi r6, -127 : R6 0 -> -127 (0xff81)
 #     movi r7, 170 : R7 0 -> 170 (0x00aa)
 #     [PASS] 99 checks passed
-# --- Section 4: add
-#     add r0, r1 : R0 5 -> -4 (0xfffc)
-#     add r2, r3 : R2 100 -> 0 (0x0000)
-#     add r4, r6 : R4 255 -> 332 (0x014c)
-#     add r5, r5 : R5 -256 -> -512 (0xfe00)
-#     add r7, r7 : R7 33 -> 66 (0x0042)
-#     add r7, r0 : R7 66 -> 62 (0x003e)
-#     [PASS] 158 checks passed
-# --- Section 5: addi
+# --- Section 4: addi
 #     addi r0, 0 : R0 5 -> 5 (0x0005)
 #     addi r1, 9 : R1 -9 -> 0 (0x0000)
 #     addi r2, 255 : R2 100 -> 355 (0x0163)
@@ -109,88 +399,27 @@ run -all
 #     addi r5, 255 : R5 -256 -> -1 (0xffff)
 #     addi r7, -33 : R7 33 -> 0 (0x0000)
 #     [PASS] 171 checks passed
-# --- Section 6: sub
-#     sub r0, r1 : R0 5 -> 14 (0x000e)
-#     sub r2, r3 : R2 100 -> 200 (0x00c8)
-#     sub r4, r4 : R4 255 -> 0 (0x0000)
-#     sub r5, r6 : R5 -256 -> -333 (0xfeb3)
-#     sub r7, r0 : R7 33 -> 19 (0x0013)
-#     sub r1, r7 : R1 -9 -> -28 (0xffe4)
-#     [PASS] 158 checks passed
-# --- Section 7: Overflow / underflow wrap
-#     movi r0, 255 : R0 14 -> 255 (0x00ff)
-#     add r0, r0 : R0 255 -> 510 (0x01fe)
-#     add r0, r0 : R0 510 -> 1020 (0x03fc)
-#     add r0, r0 : R0 1020 -> 2040 (0x07f8)
-#     add r0, r0 : R0 2040 -> 4080 (0x0ff0)
-#     add r0, r0 : R0 4080 -> 8160 (0x1fe0)
-#     add r0, r0 : R0 8160 -> 16320 (0x3fc0)
-#     add r0, r0 : R0 16320 -> 32640 (0x7f80)
-#     addi r0, 127 : R0 32640 -> 32767 (0x7fff)
-#     movi r1, 1 : R1 -28 -> 1 (0x0001)
-#     add r0, r1 : R0 32767 -> -32768 (0x8000)
-#     addi r0, -1 : R0 -32768 -> 32767 (0x7fff)
-#     addi r0, 255 : R0 32767 -> -32514 (0x80fe)
-#     movi r2, 0 : R2 200 -> 0 (0x0000)
-#     sub r2, r1 : R2 0 -> -1 (0xffff)
-#     sub r0, r2 : R0 -32514 -> -32513 (0x80ff)
-#     movi r3, -256 : R3 -100 -> -256 (0xff00)
-#     sub r4, r4 : R4 0 -> 0 (0x0000)
-#     sub r4, r1 : R4 0 -> -1 (0xffff)
-#     add r3, r3 : R3 -256 -> -512 (0xfe00)
-#     [PASS] 240 checks passed
-# --- Section 8: din held (no scrambling)
-#     [PASS] 130 checks passed
-# --- Section 9: Exhaustive Rx / Ry addressing
-#     [PASS] 13232 checks passed
-# --- Section 10: enable gating (pause in every tick)
-#     [PASS] 810 checks passed
-# --- Section 11: Reset mid-instruction
-#     [PASS] 381 checks passed
-# --- Section 12: Undefined opcode (bez) is a NOP
-#     [PASS] 146 checks passed
-# --- Section 13: Random regression (LFSR)
-#     [PASS] 6302 checks passed
-# --- Section 14: Task 3: mul, ssi and disp
+# --- Section 5: Task 3: mul, ssi and disp
 #     [PASS] 5 checks passed
 # 
-# ==================================================
 #  TEST SUMMARY
-# ==================================================
 #   PASS  Reset (3 checks)
 #   PASS  tick_FSM sequence (24 checks)
 #   PASS  movi (99 checks)
-#   PASS  add (158 checks)
 #   PASS  addi (171 checks)
-#   PASS  sub (158 checks)
-#   PASS  Overflow / underflow wrap (240 checks)
-#   PASS  din held (no scrambling) (130 checks)
-#   PASS  Exhaustive Rx / Ry addressing (13232 checks)
-#   PASS  enable gating (pause in every tick) (810 checks)
-#   PASS  Reset mid-instruction (381 checks)
-#   PASS  Undefined opcode (bez) is a NOP (146 checks)
-#   PASS  Random regression (LFSR) (6302 checks)
 #   PASS  Task 3: mul, ssi and disp (5 checks)
-# --------------------------------------------------
-#  ALL 21859 CHECKS PASSED
-# ==================================================
-# ** Note: $stop    : C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v(825)
-#    Time: 83676 ns  Iteration: 0  Instance: /proc_extension_tb
-# Break in Module proc_extension_tb at C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v line 825
-vsim work.proc_extension_tb broken_proc_extension.v
-# End time: 15:01:01 on Oct 14,2026, Elapsed time: 0:01:34
+#  ALL 302 CHECKS PASSED
+# ** Note: $stop    : proc_extension_tb.v(642)
+#    Time: 1426 ns  Iteration: 0  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at proc_extension_tb.v line 642
+# End time: 13:14:10 on Oct 18,2026, Elapsed time: 0:01:26
 # Errors: 0, Warnings: 0
-# vsim work.proc_extension_tb 
-# Start time: 15:01:01 on Oct 14,2026
-# Loading work.proc_extension_tb
-# Loading work.extended_proc
-# Loading work.sign_extend
-# Loading work.tick_FSM
-# Loading work.multiplexer
-# Loading work.alu
-# Loading work.register_n
-# OpenFile broken_proc_extension.v
-run -all
+# 
+# ======================================================================================
+#  TEST 4: proc_extension_tb on broken_proc_extension.v (should FAIL, showing the testbench catches the bugs)
+# ======================================================================================
+# vsim -quiet -voptargs="+acc" rt_work.proc_extension_tb 
+# Start time: 13:14:10 on Oct 18,2026
 # ==================================================
 #  ECE2072 extended_proc testbench (Task 3)
 #  clock period = 10 ns, random instructions = 500
@@ -209,15 +438,7 @@ run -all
 #     movi r6, -127 : R6 0 -> -127 (0xff81)
 #     movi r7, 170 : R7 0 -> 170 (0x00aa)
 #     [PASS] 99 checks passed
-# --- Section 4: add
-#     add r0, r1 : R0 5 -> -4 (0xfffc)
-#     add r2, r3 : R2 100 -> 0 (0x0000)
-#     add r4, r6 : R4 255 -> 332 (0x014c)
-#     add r5, r5 : R5 -256 -> -512 (0xfe00)
-#     add r7, r7 : R7 33 -> 66 (0x0042)
-#     add r7, r0 : R7 66 -> 62 (0x003e)
-#     [PASS] 158 checks passed
-# --- Section 5: addi
+# --- Section 4: addi
 #     addi r0, 0 : R0 5 -> 5 (0x0005)
 #     addi r1, 9 : R1 -9 -> 0 (0x0000)
 #     addi r2, 255 : R2 100 -> 355 (0x0163)
@@ -226,89 +447,42 @@ run -all
 #     addi r5, 255 : R5 -256 -> -1 (0xffff)
 #     addi r7, -33 : R7 33 -> 0 (0x0000)
 #     [PASS] 171 checks passed
-# --- Section 6: sub
-#     sub r0, r1 : R0 5 -> 14 (0x000e)
-#     sub r2, r3 : R2 100 -> 200 (0x00c8)
-#     sub r4, r4 : R4 255 -> 0 (0x0000)
-#     sub r5, r6 : R5 -256 -> -333 (0xfeb3)
-#     sub r7, r0 : R7 33 -> 19 (0x0013)
-#     sub r1, r7 : R1 -9 -> -28 (0xffe4)
-#     [PASS] 158 checks passed
-# --- Section 7: Overflow / underflow wrap
-#     movi r0, 255 : R0 14 -> 255 (0x00ff)
-#     add r0, r0 : R0 255 -> 510 (0x01fe)
-#     add r0, r0 : R0 510 -> 1020 (0x03fc)
-#     add r0, r0 : R0 1020 -> 2040 (0x07f8)
-#     add r0, r0 : R0 2040 -> 4080 (0x0ff0)
-#     add r0, r0 : R0 4080 -> 8160 (0x1fe0)
-#     add r0, r0 : R0 8160 -> 16320 (0x3fc0)
-#     add r0, r0 : R0 16320 -> 32640 (0x7f80)
-#     addi r0, 127 : R0 32640 -> 32767 (0x7fff)
-#     movi r1, 1 : R1 -28 -> 1 (0x0001)
-#     add r0, r1 : R0 32767 -> -32768 (0x8000)
-#     addi r0, -1 : R0 -32768 -> 32767 (0x7fff)
-#     addi r0, 255 : R0 32767 -> -32514 (0x80fe)
-#     movi r2, 0 : R2 200 -> 0 (0x0000)
-#     sub r2, r1 : R2 0 -> -1 (0xffff)
-#     sub r0, r2 : R0 -32514 -> -32513 (0x80ff)
-#     movi r3, -256 : R3 -100 -> -256 (0xff00)
-#     sub r4, r4 : R4 0 -> 0 (0x0000)
-#     sub r4, r1 : R4 0 -> -1 (0xffff)
-#     add r3, r3 : R3 -256 -> -512 (0xfe00)
-#     [PASS] 240 checks passed
-# --- Section 8: din held (no scrambling)
-#     [PASS] 130 checks passed
-# --- Section 9: Exhaustive Rx / Ry addressing
-#     [PASS] 13232 checks passed
-# --- Section 10: enable gating (pause in every tick)
-#     [PASS] 810 checks passed
-# --- Section 11: Reset mid-instruction
-#     [PASS] 381 checks passed
-# --- Section 12: Undefined opcode (bez) is a NOP
-#     [PASS] 146 checks passed
-# --- Section 13: Random regression (LFSR)
-#     [PASS] 6302 checks passed
-# --- Section 14: Task 3: mul, ssi and disp
-#     [PASS] 5 checks passed
+# --- Section 5: Task 3: mul, ssi and disp
+#   [FAIL] t=1226 ns | mul: 6 * -7 = -42 | expected -42 (0xffd6), got -1 (0xffff)
+#          while executing: mul r1, r2
+#   [FAIL] t=1306 ns | ssi: 5 shifted left by 3 = 40 | expected 40 (0x0028), got 0 (0x0000)
+#          while executing: ssi r3, 3   (immediate word = 9'b000000011)
+#   [FAIL] t=1346 ns | ssi: 40 shifted right by 2 = 10 | expected 10 (0x000a), got 0 (0x0000)
+#          while executing: ssi r3, -2   (immediate word = 9'b111111110)
+#   [FAIL] t=1386 ns | disp: display = R3 (10) | expected 10 (0x000a), got 0 (0x0000)
+#          while executing: disp r3, r0
+#   [FAIL] t=1426 ns | disp: display still 10 after R3 = 11 | expected 10 (0x000a), got 0 (0x0000)
+#          while executing: addi r3, 1   (immediate word = 9'b000000001)
+#     [FAIL] 5 of 5 checks failed
 # 
-# ==================================================
 #  TEST SUMMARY
-# ==================================================
 #   PASS  Reset (3 checks)
 #   PASS  tick_FSM sequence (24 checks)
 #   PASS  movi (99 checks)
-#   PASS  add (158 checks)
 #   PASS  addi (171 checks)
-#   PASS  sub (158 checks)
-#   PASS  Overflow / underflow wrap (240 checks)
-#   PASS  din held (no scrambling) (130 checks)
-#   PASS  Exhaustive Rx / Ry addressing (13232 checks)
-#   PASS  enable gating (pause in every tick) (810 checks)
-#   PASS  Reset mid-instruction (381 checks)
-#   PASS  Undefined opcode (bez) is a NOP (146 checks)
-#   PASS  Random regression (LFSR) (6302 checks)
-#   PASS  Task 3: mul, ssi and disp (5 checks)
-# --------------------------------------------------
-#  ALL 21859 CHECKS PASSED
-# ==================================================
-# ** Note: $stop    : C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v(825)
-#    Time: 83676 ns  Iteration: 0  Instance: /proc_extension_tb
-# Break in Module proc_extension_tb at C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/proc_extension_tb.v line 825
-vsim work.proc_extension_tb broken_proc_extension
-# End time: 15:04:16 on Oct 14,2026, Elapsed time: 0:03:15
+#   FAIL  Task 3: mul, ssi and disp (5 of 5 checks failed)
+#  5 OF 302 CHECKS FAILED, see the [FAIL] lines above
+# ** Note: $stop    : proc_extension_tb.v(642)
+#    Time: 1426 ns  Iteration: 0  Instance: /proc_extension_tb
+# Break in Module proc_extension_tb at proc_extension_tb.v line 642
+# End time: 13:15:39 on Oct 18,2026, Elapsed time: 0:01:29
 # Errors: 0, Warnings: 0
-# vsim work.proc_extension_tb broken_proc_extension 
-# Start time: 15:04:16 on Oct 14,2026
-# Loading work.proc_extension_tb
-# Loading work.extended_proc
-# Loading work.sign_extend
-# Loading work.tick_FSM
-# Loading work.multiplexer
-# Loading work.alu
-# Loading work.register_n
-# ** Error: (vsim-3170) Could not find 'broken_proc_extension'.
-#         Searched libraries:
-#             C:/Users/hoora/Documents/GitHub/FPGAProcessor/FPGAProcessor/simulation/modelsim/rtl_work
-# Error loading design
-# End time: 15:05:43 on Oct 14,2026, Elapsed time: 0:01:27
-# Errors: 1, Warnings: 0
+# 
+# ======================================================================================
+#  SUMMARY
+# ======================================================================================
+#  Test  Testbench          Design                   Expected  Result  Details
+# --------------------------------------------------------------------------------------
+#  1     components_tb      components.v             PASS      PASS    0 failures in any component
+#  2     components_tb      broken_components.v      FAIL      FAIL    274 failures: sign extender 256, tick FSM 6, alu 12
+#  3     proc_extension_tb  proc_extension.v         PASS      PASS    all 302 checks passed
+#  4     proc_extension_tb  broken_proc_extension.v  FAIL      FAIL    5 of 302 checks failed, all in section 5 (section 5 is mul, ssi and disp)
+# --------------------------------------------------------------------------------------
+#  components_tb      WORKS: passes the working design and catches the bugs in the broken one
+#  proc_extension_tb  WORKS: passes the working design and catches the bugs in the broken one
+# ======================================================================================
