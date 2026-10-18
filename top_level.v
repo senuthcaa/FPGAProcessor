@@ -6,7 +6,7 @@
 
 */
 module top_level (
-	input wire [9:0] SW,
+	input wire [8:0] SW,
 	input wire [1:0] KEY,
 
 	output wire [9:0] LEDR,

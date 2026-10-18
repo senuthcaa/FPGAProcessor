@@ -11,8 +11,9 @@ module top_level_memory #(
 	parameter CLK_DIV = 2500000
 ) (
 	input wire CLOCK_50,
-	input wire [9:0] SW,
-	input wire [1:0] KEY,
+	//only SW[9] and KEY[0] are read, so they are the only switch and key pins (an unused input pin is a compile warning)
+	input wire [9:9] SW,
+	input wire [0:0] KEY,
 
 	output wire [9:0] LEDR,
 	output wire [7:0] HEX0,
