@@ -40,7 +40,7 @@ set_global_assignment -name FAMILY "MAX 10"
 set_global_assignment -name DEVICE 10M50DAF484C7G
 # MAX 10 only allows memory initialisation (the instruction ROM) in a configuration mode "with Memory Initialization"
 set_global_assignment -name INTERNAL_FLASH_UPDATE_MODE "SINGLE IMAGE WITH ERAM"
-set_global_assignment -name TOP_LEVEL_ENTITY components_tb
+set_global_assignment -name TOP_LEVEL_ENTITY top_level_memory
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:49:25  SEPTEMBER 13, 2026"
 set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
